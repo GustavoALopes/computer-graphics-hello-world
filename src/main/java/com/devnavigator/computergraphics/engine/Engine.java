@@ -1,13 +1,17 @@
-package com.devnavigator.computergraphics;
+package com.devnavigator.computergraphics.engine;
 
 import com.devnavigator.computergraphics.components.Point;
 import com.devnavigator.computergraphics.components.Square;
 import com.devnavigator.computergraphics.components.Triangle;
+import com.devnavigator.computergraphics.components.base.BaseGraphicModel;
 import com.devnavigator.computergraphics.engine.components.Renderer;
 import com.devnavigator.computergraphics.engine.components.Window;
 import com.devnavigator.computergraphics.engine.components.interfaces.IGraphicModel;
+import com.devnavigator.computergraphics.engine.components.math.Matrix4f;
 import com.devnavigator.computergraphics.engine.interfaces.IEngine;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL33;
+import org.lwjgl.system.MemoryStack;
 
 public class Engine implements IEngine {
 
@@ -15,7 +19,7 @@ public class Engine implements IEngine {
 
     private final Renderer renderer;
 
-    private IGraphicModel model;
+    private BaseGraphicModel model;
 
     private boolean isRunning;
 
@@ -48,9 +52,9 @@ public class Engine implements IEngine {
         this.renderer.init();
 
 //        this.model = Triangle.create(
+//                Point.create(0.0f, 0.5f),
 //                Point.create(-0.5f, -0.5f),
-//                Point.create(-0.5f, 0.5f),
-//                Point.create(0.5f, 0.5f)
+//                Point.create(0.5f, -0.5f)
 //        );
 
         this.model = Square.create(
@@ -64,6 +68,7 @@ public class Engine implements IEngine {
     }
 
     private void loop() {
+        final var startTime = GLFW.glfwGetTime();
         while(this.isRunning) {
 
             if(this.window.shouldClose()) {
@@ -72,7 +77,9 @@ public class Engine implements IEngine {
 
             GL33.glClear(GL33.GL_COLOR_BUFFER_BIT);
 
-            this.renderer.render(this.model);
+            this.renderer.render(
+                this.model
+            );
 
             this.window.update();
         }

@@ -54,4 +54,13 @@ public class ProgramShader {
     public void disableVertexAttribArray(final int index) {
         GL33.glDisableVertexAttribArray(index);
     }
+
+    public int getUniformLocation(
+            final CharSequence name
+    ) {
+        return GL30.glGetUniformLocation(
+                this.id,
+                name
+        );
+    }
 }

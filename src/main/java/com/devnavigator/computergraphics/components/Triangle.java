@@ -1,39 +1,24 @@
 package com.devnavigator.computergraphics.components;
 
+import com.devnavigator.computergraphics.components.base.BaseGraphicModel;
 import com.devnavigator.computergraphics.components.base.RawModel;
 import com.devnavigator.computergraphics.engine.components.interfaces.IGraphicModel;
 
-public class Triangle implements IGraphicModel {
-
-
-    private final RawModel model;
-
-    private final float[] data;
-
-    private final int numVertex;
+public class Triangle extends BaseGraphicModel {
 
     public Triangle(
             final float[] points
     ) {
-        this.data = points;
-        this.numVertex = 3;
-
-        this.model = RawModel.create(
+        super(
+            RawModel.create(
                 points,
                 2
+            )
+            .addIndexBuffer(new int[]{
+                    0, 1, 2
+            }),
+            3
         );
-    }
-
-    public float[] getData() {
-        return this.data;
-    }
-
-    public int getNumVertex() {
-        return this.numVertex;
-    }
-
-    public RawModel getModel() {
-        return this.model;
     }
 
     public static Triangle create(

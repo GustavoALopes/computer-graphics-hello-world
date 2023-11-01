@@ -1,13 +1,17 @@
 package com.devnavigator.computergraphics.engine.components;
 
+import com.devnavigator.computergraphics.components.base.BaseGraphicModel;
 import com.devnavigator.computergraphics.engine.components.interfaces.IGraphicModel;
+import com.devnavigator.computergraphics.engine.components.math.Matrix4f;
 import com.devnavigator.computergraphics.engine.components.renderer.ProgramShader;
 import com.devnavigator.computergraphics.engine.components.renderer.Shader;
 import com.devnavigator.computergraphics.engine.components.renderer.VertexArrayObject;
 import com.devnavigator.computergraphics.engine.components.renderer.VertexBufferObject;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL33;
+import org.lwjgl.system.MemoryStack;
 
 import java.nio.FloatBuffer;
 
@@ -68,29 +72,39 @@ public class Renderer {
 //        this.program.enableVertexAttribArray(0);
     }
 
-    public void render(final IGraphicModel model) {
+    public void render(
+        final BaseGraphicModel model
+    ) {
         GL33.glBindVertexArray(model.getModel().getVaoId());
-//        this.numVertex += model.getNumVertex();
-//
-//        this.program.addVertexAttrib(
-//                0,
-//                2,
-//                0,
-//                0L
-//        );
-//
+        this.numVertex += model.getNumVertex();
+
+        this.program.use();
+
+        final var location = this.program.getUniformLocation("Matrix");
+        model.rotate(
+                location,
+                (float)Math.toRadians(
+                        GLFW.glfwGetTime() * 360.0
+                )
+        );
+
+//        try(final var stack = MemoryStack.stackPush()) {
+//            final var buffer = stack.mallocFloat(4*4);
+//            rotate.toBuffer(buffer);
+//            GL33.glUniformMatrix4fv(location, false, buffer);
+//        }
+
         this.program.enableVertexAttribArray(0);
 
-        this.flush(model.getNumVertex());
+        this.flush();
 
         this.cleanup();
     }
 
-    public void flush(final int numVertex) {
-
+    public void flush() {
         GL33.glDrawElements(
                 GL33.GL_TRIANGLES,
-                numVertex,
+                this.numVertex,
                 GL33.GL_UNSIGNED_INT,
                 0
         );

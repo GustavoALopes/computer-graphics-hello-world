@@ -1,32 +1,38 @@
 package com.devnavigator.computergraphics.components.base;
 
 import com.devnavigator.computergraphics.engine.components.IndexBuffer;
+import com.devnavigator.computergraphics.engine.components.Texture;
 import com.devnavigator.computergraphics.engine.components.renderer.VertexArrayObject;
 import com.devnavigator.computergraphics.engine.components.renderer.VertexBufferObject;
 import org.lwjgl.opengl.GL33;
+
+import java.util.Map;
 
 public class RawModel {
 
     private final VertexArrayObject vao;
 
-    private final VertexBufferObject vbo;
+    private final Map<String, VertexBufferObject> vbo;
+
+    private Texture texture;
 
     private IndexBuffer indexes;
 
     private RawModel(
             final VertexArrayObject vao,
-            final VertexBufferObject vbo
+            final Map<String, VertexBufferObject> vbo
     ) {
         this.vao = vao;
         this.vbo = vbo;
+        this.texture = null;
     }
 
     public int getVaoId() {
         return this.vao.getId();
     }
 
-    public int getVboId() {
-        return this.vbo.getId();
+    public int getVboId(final String type) {
+        return this.vbo.get(type).getId();
     }
 
     public static RawModel create(
@@ -50,13 +56,18 @@ public class RawModel {
                 0L
         );
 
-        return new RawModel(vao, vbo);
+        return new RawModel(vao, Map.of("position", vbo));
     }
 
     public RawModel addIndexBuffer(final int[] indexes) {
         this.indexes = new IndexBuffer(indexes.length);
         this.indexes.bind();
         this.indexes.updateData(indexes);
+        return this;
+    }
+
+    public RawModel addTexture(final Texture texture) {
+        this.texture = texture;
         return this;
     }
 }
