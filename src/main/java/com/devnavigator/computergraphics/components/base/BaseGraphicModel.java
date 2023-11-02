@@ -52,4 +52,32 @@ public abstract class BaseGraphicModel {
         }
         return this;
     }
+
+    public BaseGraphicModel changeColor(
+            final int shaderIndexAttrib,
+            final int[] color
+    ) {
+        this.model.changeColor(
+                shaderIndexAttrib,
+                color
+        );
+        return this;
+    }
+
+    public BaseGraphicModel changeColor(
+            final int shaderIndexAttrib,
+            final int red,
+            final int green,
+            final int blue
+    ) {
+        if(red > 255) {
+            throw new RuntimeException("The red value color need to be into range of 0 at 255");
+        } else if (green > 255) {
+            throw new RuntimeException("The green value color need to be into range of 0 at 255");
+        } else if (blue > 255) {
+            throw new RuntimeException("The blue value color need to be into range of 0 at 255");
+        }
+
+        return this.changeColor(shaderIndexAttrib, new int[]{ red, green, blue });
+    }
 }

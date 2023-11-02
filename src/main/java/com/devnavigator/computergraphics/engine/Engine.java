@@ -51,18 +51,24 @@ public class Engine implements IEngine {
 
         this.renderer.init();
 
-//        this.model = Triangle.create(
-//                Point.create(0.0f, 0.5f),
-//                Point.create(-0.5f, -0.5f),
-//                Point.create(0.5f, -0.5f)
-//        );
-
-        this.model = Square.create(
-                Point.create(-0.5f, 0.5f),
+        this.model = Triangle.create(
+                Point.create(0.0f, 0.5f),
                 Point.create(-0.5f, -0.5f),
-                Point.create(0.5f, -0.5f),
-                Point.create(0.5f, 0.5f)
+                Point.create(0.5f, -0.5f)
+        )
+        .changeColor(
+                1,
+                255,
+                0,
+                0
         );
+
+//        this.model = Square.create(
+//                Point.create(-0.5f, 0.5f),
+//                Point.create(-0.5f, -0.5f),
+//                Point.create(0.5f, -0.5f),
+//                Point.create(0.5f, 0.5f)
+//        );
 
         this.isRunning = true;
     }

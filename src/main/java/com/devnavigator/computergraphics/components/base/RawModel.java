@@ -6,25 +6,23 @@ import com.devnavigator.computergraphics.engine.components.renderer.VertexArrayO
 import com.devnavigator.computergraphics.engine.components.renderer.VertexBufferObject;
 import org.lwjgl.opengl.GL33;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class RawModel {
 
     private final VertexArrayObject vao;
 
-    private final Map<String, VertexBufferObject> vbo;
+    private final Map<String, VertexBufferObject> vbos;
 
     private Texture texture;
 
     private IndexBuffer indexes;
 
-    private RawModel(
-            final VertexArrayObject vao,
-            final Map<String, VertexBufferObject> vbo
-    ) {
-        this.vao = vao;
-        this.vbo = vbo;
-        this.texture = null;
+    private RawModel() {
+        this.vao = new VertexArrayObject();
+        this.vbos = new HashMap<>();
     }
 
     public int getVaoId() {
@@ -32,23 +30,41 @@ public class RawModel {
     }
 
     public int getVboId(final String type) {
-        return this.vbo.get(type).getId();
+        return this.vbos.get(type).getId();
+    }
+
+    public static RawModel create() {
+        return new RawModel();
     }
 
     public static RawModel create(
-            final float[] data,
+            final float[] position,
             final int coordSize
     ) {
-        final var vao = new VertexArrayObject();
-        vao.bind();
+        final var model = new RawModel();
+        model.setPosition(
+                0,
+                position,
+                coordSize
+        );
 
-        final var vbo = new VertexBufferObject();
+        return model;
+    }
+
+    public RawModel setPosition(
+            final int shaderPositionIndex,
+            final float[] position,
+            final int coordSize
+    ) {
+        this.vao.bind();
+
+        final var vbo = this.getOrCreateVBO("position");
         vbo.bind();
 
-        vbo.updateData(data);
+        vbo.updateData(position);
 
         GL33.glVertexAttribPointer(
-                0,
+                shaderPositionIndex,
                 coordSize,
                 GL33.GL_FLOAT,
                 false,
@@ -56,7 +72,7 @@ public class RawModel {
                 0L
         );
 
-        return new RawModel(vao, Map.of("position", vbo));
+        return this;
     }
 
     public RawModel addIndexBuffer(final int[] indexes) {
@@ -69,5 +85,44 @@ public class RawModel {
     public RawModel addTexture(final Texture texture) {
         this.texture = texture;
         return this;
+    }
+
+    public RawModel changeColor(
+            final int shaderIndexAttrib,
+            final int[] color
+    ) {
+        final var vbo = this.getOrCreateVBO("color");
+        vbo.bind();
+        vbo.updateData(
+            color
+        );
+
+        GL33.glVertexAttribPointer(
+                shaderIndexAttrib,
+                3,
+                GL33.GL_UNSIGNED_BYTE,
+                true,
+                0,
+                0L
+        );
+
+        GL33.glEnableVertexAttribArray(shaderIndexAttrib);
+
+        return this;
+    }
+
+    private VertexBufferObject getOrCreateVBO(final String name) {
+        var vbo = this.vbos.get("name");
+        if(Objects.isNull(vbo)) {
+            vbo = this.createNewVBO(name);
+        }
+
+        return vbo;
+    }
+
+    private VertexBufferObject createNewVBO(final String name) {
+        final var vbo = new VertexBufferObject();
+        this.vbos.put(name, vbo);
+        return vbo;
     }
 }

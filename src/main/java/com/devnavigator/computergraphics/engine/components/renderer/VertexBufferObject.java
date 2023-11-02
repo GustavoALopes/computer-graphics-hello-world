@@ -25,11 +25,19 @@ public class VertexBufferObject {
         );
     }
 
-    public void updateData(final int target, final float[] data, final int type) {
+    public void updateData(final int[] data) {
         GL33.glBufferData(
                 GL33.GL_ARRAY_BUFFER,
                 data,
                 GL33.GL_STATIC_DRAW
+        );
+    }
+
+    public void updateData(final int target, final float[] data, final int type) {
+        GL33.glBufferData(
+                target,
+                data,
+                type
         );
     }
 
