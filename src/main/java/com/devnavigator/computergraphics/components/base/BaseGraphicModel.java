@@ -11,6 +11,12 @@ public abstract class BaseGraphicModel {
 
     private final int numVertex;
 
+    private Matrix4f translate;
+
+    private Matrix4f scale;
+
+    private Matrix4f rotate;
+
     public BaseGraphicModel(
             final RawModel model,
             final int numVertex
@@ -38,18 +44,18 @@ public abstract class BaseGraphicModel {
             final int shaderLocation,
             final float angle
     ) {
-        final var rotate = Matrix4f.rotate(
+        this.rotate = Matrix4f.rotate(
                 angle,
                 0f,
                 0f,
                 1f
         );
 
-        try(final var stack = MemoryStack.stackPush()) {
-            final var buffer = stack.mallocFloat(4*4);
-            rotate.toBuffer(buffer);
-            GL33.glUniformMatrix4fv(shaderLocation, false, buffer);
-        }
+//        try(final var stack = MemoryStack.stackPush()) {
+//            final var buffer = stack.mallocFloat(4*4);
+//            rotate.toBuffer(buffer);
+//            GL33.glUniformMatrix4fv(shaderLocation, false, buffer);
+//        }
         return this;
     }
 
@@ -79,5 +85,19 @@ public abstract class BaseGraphicModel {
         }
 
         return this.changeColor(shaderIndexAttrib, new int[]{ red, green, blue });
+    }
+
+    public BaseGraphicModel changeScale(final float x, final float y, final float z) {
+        this.scale = Matrix4f.scale(x, y, z);
+        return this;
+    }
+
+    public BaseGraphicModel translate(final float x, final float y, final float z) {
+        this.translate = Matrix4f.translate(x, y, z);
+        return this;
+    }
+
+    public Matrix4f render() {
+        return this.translate.multiply(this.rotate).multiply(this.scale);
     }
 }

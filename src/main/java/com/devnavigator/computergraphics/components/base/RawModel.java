@@ -72,6 +72,8 @@ public class RawModel {
                 0L
         );
 
+        GL33.glEnableVertexAttribArray(shaderPositionIndex);
+
         return this;
     }
 

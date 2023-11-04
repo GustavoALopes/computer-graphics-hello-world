@@ -13,18 +13,22 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL33;
 import org.lwjgl.system.MemoryStack;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public class Engine implements IEngine {
 
     private Window window;
 
     private final Renderer renderer;
 
-    private BaseGraphicModel model;
+    private Collection<BaseGraphicModel> models;
 
     private boolean isRunning;
 
     public Engine() {
         this.renderer = new Renderer();
+        this.models = new ArrayList<>();
     }
 
     public void start() {
@@ -51,7 +55,19 @@ public class Engine implements IEngine {
 
         this.renderer.init();
 
-        this.model = Triangle.create(
+        this.models.add(Square.create(
+                Point.create(-0.5f, 0.5f),
+                Point.create(-0.5f, -0.5f),
+                Point.create(0.5f, -0.5f),
+                Point.create(0.5f, 0.5f)
+        )
+         .changeColor(1, 255, 255, 255)
+         .translate(0.5f, 0.5f, 0.f)
+         .changeScale(0.35f, 0.35f, 1f)
+        );
+
+
+        this.models.add(Triangle.create(
                 Point.create(0.0f, 0.5f),
                 Point.create(-0.5f, -0.5f),
                 Point.create(0.5f, -0.5f)
@@ -60,15 +76,10 @@ public class Engine implements IEngine {
                 1,
                 255,
                 0,
-                0
-        );
-
-//        this.model = Square.create(
-//                Point.create(-0.5f, 0.5f),
-//                Point.create(-0.5f, -0.5f),
-//                Point.create(0.5f, -0.5f),
-//                Point.create(0.5f, 0.5f)
-//        );
+                100
+        )
+        .translate(-0.5f, 0.5f, 1f)
+        .changeScale(0.35f, 0.35f, 1f));
 
         this.isRunning = true;
     }
@@ -84,7 +95,7 @@ public class Engine implements IEngine {
             GL33.glClear(GL33.GL_COLOR_BUFFER_BIT);
 
             this.renderer.render(
-                this.model
+                this.models
             );
 
             this.window.update();

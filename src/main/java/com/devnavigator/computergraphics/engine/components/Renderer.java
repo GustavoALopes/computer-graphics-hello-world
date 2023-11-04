@@ -14,6 +14,8 @@ import org.lwjgl.opengl.GL33;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.FloatBuffer;
+import java.util.Collection;
+import java.util.Collections;
 
 public class Renderer {
 
@@ -49,27 +51,11 @@ public class Renderer {
 
         this.program = compileAndLinkShaders();
         this.program.use();
-//
-//        this.vao = new VertexArrayObject();
-//        this.vao.bind();
-//
-//        this.vbo = new VertexBufferObject();
-//        this.vbo.bind();
+    }
 
-//        this.vbo.updateData(
-//                GL33.GL_ARRAY_BUFFER,
-//                vertices,
-//                GL33.GL_STATIC_DRAW
-//        );
-
-//        this.program.addVertexAttrib(
-//                0,
-//                2,
-//                0,
-//                0L
-//        );
-//
-//        this.program.enableVertexAttribArray(0);
+    public void render(final Collection<BaseGraphicModel> models) {
+        models.forEach(this::render);
+        this.cleanup();
     }
 
     public void render(
@@ -88,17 +74,16 @@ public class Renderer {
                 )
         );
 
-//        try(final var stack = MemoryStack.stackPush()) {
-//            final var buffer = stack.mallocFloat(4*4);
-//            rotate.toBuffer(buffer);
-//            GL33.glUniformMatrix4fv(location, false, buffer);
-//        }
+        try(final var stack = MemoryStack.stackPush()) {
+            final var buffer = stack.mallocFloat(4*4);
+            model.render().toBuffer(buffer);
+            GL33.glUniformMatrix4fv(location, false, buffer);
+        }
 
-        this.program.enableVertexAttribArray(0);
+
+//        this.program.enableVertexAttribArray(0);
 
         this.flush();
-
-        this.cleanup();
     }
 
     public void flush() {
@@ -108,17 +93,10 @@ public class Renderer {
                 GL33.GL_UNSIGNED_INT,
                 0
         );
-
-//        GL33.glDrawArrays(
-//                GL33.GL_TRIANGLES,
-//                0,
-//                numVertex
-//        );
-
     }
 
     private void cleanup() {
-        this.program.disableVertexAttribArray(0);
+//        this.program.disableVertexAttribArray(0);
         this.numVertex = 0;
         GL33.glBindVertexArray(0);
     }
