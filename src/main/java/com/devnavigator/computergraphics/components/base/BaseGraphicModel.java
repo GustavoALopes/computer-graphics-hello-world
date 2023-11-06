@@ -5,6 +5,9 @@ import com.devnavigator.computergraphics.engine.components.math.Matrix4f;
 import org.lwjgl.opengl.GL33;
 import org.lwjgl.system.MemoryStack;
 
+import java.util.Objects;
+import java.util.Optional;
+
 public abstract class BaseGraphicModel {
 
     protected final RawModel model;
@@ -33,15 +36,29 @@ public abstract class BaseGraphicModel {
         return this.numVertex;
     }
 
-    public BaseGraphicModel addTexture(final Texture texture) {
-//        this.model.addTexture(
-//                texture.
-//        )
+    public BaseGraphicModel addTexture(
+            final String texturePath,
+            final float[] coordinates
+    ) {
+        return this.addTexture(
+                Texture.loadTexture(texturePath),
+                coordinates
+        );
+    }
+
+    public BaseGraphicModel addTexture(
+            final Texture texture,
+            final float[] coordinates
+    ) {
+        this.model.addTexture(
+                2,
+                texture,
+                coordinates
+        );
         return this;
     }
 
     public BaseGraphicModel rotate(
-            final int shaderLocation,
             final float angle
     ) {
         this.rotate = Matrix4f.rotate(
@@ -50,12 +67,6 @@ public abstract class BaseGraphicModel {
                 0f,
                 1f
         );
-
-//        try(final var stack = MemoryStack.stackPush()) {
-//            final var buffer = stack.mallocFloat(4*4);
-//            rotate.toBuffer(buffer);
-//            GL33.glUniformMatrix4fv(shaderLocation, false, buffer);
-//        }
         return this;
     }
 
@@ -98,6 +109,25 @@ public abstract class BaseGraphicModel {
     }
 
     public Matrix4f render() {
-        return this.translate.multiply(this.rotate).multiply(this.scale);
+        var matrix = Optional.ofNullable(this.translate)
+                .orElse(new Matrix4f());
+
+        if(!Objects.isNull(this.rotate)) {
+            matrix = matrix.multiply(this.rotate);
+        }
+        if(!Objects.isNull(this.scale)) {
+            matrix = matrix.multiply(this.scale);
+        }
+
+        return matrix;
+    }
+
+    public BaseGraphicModel incrementPosition(
+            final float x,
+            final float y,
+            final float z
+    ) {
+        this.translate = this.translate.multiply(Matrix4f.translate(x, y, z));
+        return this;
     }
 }

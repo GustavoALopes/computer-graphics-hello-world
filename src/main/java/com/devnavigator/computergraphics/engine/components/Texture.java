@@ -154,7 +154,7 @@ public class Texture {
      *
      * @return com.devjourney.Texture from specified file
      */
-    public static Texture loadTexture(String path) {
+    public static Texture loadTexture(final String path) {
         ByteBuffer image;
         int width, height;
         try (final var stack = MemoryStack.stackPush()) {
@@ -165,7 +165,14 @@ public class Texture {
 
             /* Load image */
             STBImage.stbi_set_flip_vertically_on_load(true);
-            image = STBImage.stbi_load(path, w, h, comp, 4);
+            image = STBImage.stbi_load(
+                    path,
+                    w,
+                    h,
+                    comp,
+                    4
+            );
+
             if (image == null) {
                 throw new RuntimeException("Failed to load a texture file!"
                         + System.lineSeparator() + STBImage.stbi_failure_reason());

@@ -84,8 +84,40 @@ public class RawModel {
         return this;
     }
 
-    public RawModel addTexture(final Texture texture) {
+    public RawModel addTexture(
+            final int shaderTextCoordsIndex,
+            final Texture texture,
+            final float[] coordinates
+    ) {
+        this.vao.bind();
+
+        final var textureAttrib = this.getOrCreateVBO("textureCoordinates");
+        textureAttrib.bind();
+
+        textureAttrib.updateData(coordinates);
+
+        GL33.glVertexAttribPointer(
+                shaderTextCoordsIndex,
+                2,
+                GL33.GL_FLOAT,
+                true,
+                0,
+                0L
+        );
+
         this.texture = texture;
+
+        GL33.glActiveTexture(GL33.GL_TEXTURE0);
+
+        GL33.glBindTexture(
+                GL33.GL_TEXTURE_2D,
+                texture.getId()
+        );
+
+        GL33.glEnableVertexAttribArray(
+                shaderTextCoordsIndex
+        );
+
         return this;
     }
 
@@ -93,6 +125,8 @@ public class RawModel {
             final int shaderIndexAttrib,
             final int[] color
     ) {
+        this.vao.bind();
+
         final var vbo = this.getOrCreateVBO("color");
         vbo.bind();
         vbo.updateData(

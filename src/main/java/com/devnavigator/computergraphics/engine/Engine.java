@@ -5,6 +5,7 @@ import com.devnavigator.computergraphics.components.Square;
 import com.devnavigator.computergraphics.components.Triangle;
 import com.devnavigator.computergraphics.components.base.BaseGraphicModel;
 import com.devnavigator.computergraphics.engine.components.Renderer;
+import com.devnavigator.computergraphics.engine.components.Texture;
 import com.devnavigator.computergraphics.engine.components.Window;
 import com.devnavigator.computergraphics.engine.components.interfaces.IGraphicModel;
 import com.devnavigator.computergraphics.engine.components.math.Matrix4f;
@@ -61,25 +62,35 @@ public class Engine implements IEngine {
                 Point.create(0.5f, -0.5f),
                 Point.create(0.5f, 0.5f)
         )
-         .changeColor(1, 255, 255, 255)
-         .translate(0.5f, 0.5f, 0.f)
-         .changeScale(0.35f, 0.35f, 1f)
+//         .changeColor(1, 255, 255, 255)
+//         .translate(0.5f, 0.5f, 0.f)
+         .translate(-0.1f, 0.0f, 0.f)
+//         .changeScale(0.35f, 0.35f, 1f)
+         .addTexture(
+                 "src/main/resources/textures/default.png",
+                 new float[] {
+                         0,0, //VO,
+                         0,1, //V1
+                         1,1, //V2
+                         1,0
+                 }
+         )
         );
 
 
-        this.models.add(Triangle.create(
-                Point.create(0.0f, 0.5f),
-                Point.create(-0.5f, -0.5f),
-                Point.create(0.5f, -0.5f)
-        )
-        .changeColor(
-                1,
-                255,
-                0,
-                100
-        )
-        .translate(-0.5f, 0.5f, 1f)
-        .changeScale(0.35f, 0.35f, 1f));
+//        this.models.add(Triangle.create(
+//                Point.create(0.0f, 0.5f),
+//                Point.create(-0.5f, -0.5f),
+//                Point.create(0.5f, -0.5f)
+//        )
+//        .changeColor(
+//                1,
+//                255,
+//                0,
+//                100
+//        )
+//        .translate(-0.5f, 0.5f, 1f)
+//        .changeScale(0.35f, 0.35f, 1f));
 
         this.isRunning = true;
     }

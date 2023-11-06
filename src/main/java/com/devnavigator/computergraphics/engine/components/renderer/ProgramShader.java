@@ -1,7 +1,9 @@
 package com.devnavigator.computergraphics.engine.components.renderer;
 
+import com.devnavigator.computergraphics.engine.components.math.Matrix4f;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL33;
+import org.lwjgl.system.MemoryStack;
 
 public class ProgramShader {
 
@@ -62,5 +64,13 @@ public class ProgramShader {
                 this.id,
                 name
         );
+    }
+
+    public void updateUniformValue(final int location, final Matrix4f value) {
+        try(final var stack = MemoryStack.stackPush()) {
+            final var buffer = stack.mallocFloat(4*4);
+            value.toBuffer(buffer);
+            GL33.glUniformMatrix4fv(location, false, buffer);
+        }
     }
 }
