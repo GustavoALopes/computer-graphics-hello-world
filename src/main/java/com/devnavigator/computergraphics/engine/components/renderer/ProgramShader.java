@@ -60,7 +60,7 @@ public class ProgramShader {
     public int getUniformLocation(
             final CharSequence name
     ) {
-        return GL30.glGetUniformLocation(
+        return GL33.glGetUniformLocation(
                 this.id,
                 name
         );

@@ -3,48 +3,45 @@ package com.devnavigator.computergraphics.engine.components;
 import com.devnavigator.computergraphics.components.base.BaseGraphicModel;
 import com.devnavigator.computergraphics.engine.components.renderer.ProgramShader;
 import com.devnavigator.computergraphics.engine.components.renderer.Shader;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL33;
 
-import java.nio.FloatBuffer;
 import java.util.Collection;
 
 public class Renderer {
 
-//    private VertexArrayObject vao;
-//
-//    private VertexBufferObject vbo;
-
-    private FloatBuffer buffer;
-
     private int numVertex;
+
+    private final Projection projection;
+
+    private final Camera camera;
 
     private ProgramShader program;
 
 
-    private static final float[] vertices = {
-            //Top triangles
-            -0.5f, -0.5f,
-            -0.5f, 0.5f,
-            0.5f, 0.5f,
-            //Bottom triangles
-            0.5f, 0.5f,
-            0.5f, -0.5f,
-            -0.5f, -0.5f
-    };
-
-    public Renderer() {
+    public Renderer(
+            final float displayWidth,
+            final float displayHeight
+    ) {
         this.numVertex = 0;
-        this.buffer = BufferUtils.createFloatBuffer(4096);
+//        this.buffer = BufferUtils.createFloatBuffer(4096);
+        this.projection = Projection.create(
+                displayWidth,
+                displayHeight
+        );
+
+        this.camera = new Camera();
     }
 
-    public void init() {
+    public void init(final Window window) {
         GL.createCapabilities();
 
         this.program = compileAndLinkShaders();
         this.program.use();
+
+        this.projection.init(this.program);
+
+        window.addCallbackListener(this.camera::move);
     }
 
     public void render(final Collection<BaseGraphicModel> models) {
@@ -55,18 +52,20 @@ public class Renderer {
     public void render(
         final BaseGraphicModel model
     ) {
+        this.program.use();
+        this.camera.update(this.program);
+
         GL33.glBindVertexArray(model.getModel().getVaoId());
 
-        this.program.use();
 
-        model.incrementPosition(0.001f, 0f, 0f);
+//        model.increasePosition(0f, 0f, -0.01f);
 //        model.rotate(
 //            (float)Math.toRadians(
 //                    GLFW.glfwGetTime() * 360.0
 //            )
 //        );
 
-        final var location = this.program.getUniformLocation("Matrix");
+        final var location = this.program.getUniformLocation("transformationMatrix");
 
         this.program.updateUniformValue(
                 location,

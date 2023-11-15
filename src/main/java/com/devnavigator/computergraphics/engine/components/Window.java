@@ -1,6 +1,7 @@
 package com.devnavigator.computergraphics.engine.components;
 
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWKeyCallbackI;
 import org.lwjgl.system.MemoryUtil;
 
 public class Window {
@@ -38,5 +39,12 @@ public class Window {
 
     public void dispose() {
         GLFW.glfwDestroyWindow(this.id);
+    }
+
+    public void addCallbackListener(final GLFWKeyCallbackI callback) {
+        GLFW.glfwSetKeyCallback(
+                this.id,
+                callback
+        );
     }
 }

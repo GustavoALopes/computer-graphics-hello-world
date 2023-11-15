@@ -2,8 +2,8 @@ package com.devnavigator.computergraphics.components.base;
 
 import com.devnavigator.computergraphics.engine.components.Texture;
 import com.devnavigator.computergraphics.engine.components.math.Matrix4f;
-import org.lwjgl.opengl.GL33;
-import org.lwjgl.system.MemoryStack;
+import com.devnavigator.computergraphics.engine.components.math.Vector3f;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -122,12 +122,27 @@ public abstract class BaseGraphicModel {
         return matrix;
     }
 
-    public BaseGraphicModel incrementPosition(
+    public BaseGraphicModel increasePosition(
             final float x,
             final float y,
             final float z
     ) {
         this.translate = this.translate.multiply(Matrix4f.translate(x, y, z));
+        return this;
+    }
+
+    public BaseGraphicModel increaseRotation(
+            final float x,
+            final float y,
+            final float z
+    ) {
+        this.rotate = Optional.ofNullable(this.rotate)
+                .orElse(new Matrix4f());
+
+        this.rotate = this.rotate.multiply(Matrix4f.rotate((float)Math.toRadians(x), 1,  0, 0));
+        this.rotate = this.rotate.multiply(Matrix4f.rotate((float)Math.toRadians(y), 0, 1, 0));
+        this.rotate = this.rotate.multiply(Matrix4f.rotate((float)Math.toRadians(z), 0, 0, 1));
+
         return this;
     }
 }

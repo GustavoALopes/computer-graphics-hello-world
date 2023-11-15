@@ -28,7 +28,10 @@ public class Engine implements IEngine {
     private boolean isRunning;
 
     public Engine() {
-        this.renderer = new Renderer();
+        this.renderer = new Renderer(
+                1024,
+                740
+        );
         this.models = new ArrayList<>();
     }
 
@@ -54,7 +57,7 @@ public class Engine implements IEngine {
                 "Hello world"
         );
 
-        this.renderer.init();
+        this.renderer.init(this.window);
 
         this.models.add(Square.create(
                 Point.create(-0.5f, 0.5f),

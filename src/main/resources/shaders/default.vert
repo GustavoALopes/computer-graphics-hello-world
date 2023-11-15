@@ -1,6 +1,8 @@
 #version 330 core
 
-uniform mat4 Matrix;
+uniform mat4 transformationMatrix;
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
 
 layout(location=0) in vec3 position;
 layout(location=1) in vec3 colorIn;
@@ -12,5 +14,5 @@ out vec2 textCoordsOut;
 void main() {
         colorOut = colorIn;
         textCoordsOut = textCoordsIn;
-        gl_Position = Matrix*vec4(position, 1.0f);
+        gl_Position = projectionMatrix * viewMatrix * transformationMatrix * vec4(position, 1.0f);
 }
