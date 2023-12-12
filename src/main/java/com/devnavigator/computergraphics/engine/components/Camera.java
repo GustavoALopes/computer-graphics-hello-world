@@ -3,15 +3,10 @@ package com.devnavigator.computergraphics.engine.components;
 import com.devnavigator.computergraphics.engine.components.math.Matrix4f;
 import com.devnavigator.computergraphics.engine.components.math.Vector3f;
 import com.devnavigator.computergraphics.engine.components.renderer.ProgramShader;
-import org.lwjgl.glfw.GLFW;
 
 public class Camera {
 
-    private boolean keyAPress;
-
-    private boolean keyDPress;
-
-    private boolean keyWPress;
+    private final KeyboardListener keyboard;
 
     private Vector3f position;
 
@@ -23,9 +18,9 @@ public class Camera {
     private float roll;
 
 
-    public Camera() {
+    public Camera(final KeyboardListener keyboardListener) {
         this.position = new Vector3f();
-        this.keyAPress = false;
+        this.keyboard = keyboardListener;
     }
 
     public Vector3f getPosition() {
@@ -44,36 +39,21 @@ public class Camera {
         return roll;
     }
 
-    public void move(final long windowId, final int key, final int scanCode, final int action, final int mods) {
-        if(action == GLFW.GLFW_PRESS && key == GLFW.GLFW_KEY_A && !this.keyAPress) {
-            this.keyAPress = true;
-        } else if (action == GLFW.GLFW_RELEASE && key == GLFW.GLFW_KEY_A && this.keyAPress) {
-            this.keyAPress = false;
-        }
-
-        if(action == GLFW.GLFW_PRESS && key == GLFW.GLFW_KEY_D && !this.keyDPress) {
-            this.keyDPress = true;
-        } else if (action == GLFW.GLFW_RELEASE && key == GLFW.GLFW_KEY_D && this.keyDPress) {
-            this.keyDPress = false;
-        }
-
-        if(action == GLFW.GLFW_PRESS && key == GLFW.GLFW_KEY_W && !this.keyWPress) {
-            this.keyWPress = true;
-        } else if (action == GLFW.GLFW_RELEASE && key == GLFW.GLFW_KEY_W && this.keyWPress) {
-            this.keyWPress = false;
-        }
-    }
-
     public void update(final ProgramShader programShader) {
-        if(this.keyAPress) {
+        if(this.keyboard.isKeyDown(KeyboardListener.Key.A)) {
             this.position.x += 0.02f;
         }
-        if(this.keyDPress) {
+
+        if(this.keyboard.isKeyDown(KeyboardListener.Key.D)) {
             this.position.x -= 0.02f;
         }
 
-        if(this.keyWPress) {
+        if(this.keyboard.isKeyDown(KeyboardListener.Key.W)) {
             this.position.z += 0.02f;
+        }
+
+        if(this.keyboard.isKeyDown(KeyboardListener.Key.S)) {
+            this.position.z -= 0.02f;
         }
 
         final var viewMatrix = createViewMatrix();

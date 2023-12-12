@@ -21,7 +21,8 @@ public class Renderer {
 
     public Renderer(
             final float displayWidth,
-            final float displayHeight
+            final float displayHeight,
+            final KeyboardListener keyboardListener
     ) {
         this.numVertex = 0;
 //        this.buffer = BufferUtils.createFloatBuffer(4096);
@@ -30,7 +31,7 @@ public class Renderer {
                 displayHeight
         );
 
-        this.camera = new Camera();
+        this.camera = new Camera(keyboardListener);
     }
 
     public void init(final Window window) {
@@ -41,7 +42,7 @@ public class Renderer {
 
         this.projection.init(this.program);
 
-        window.addCallbackListener(this.camera::move);
+//        window.addCallbackListener(this.camera::move);
     }
 
     public void render(final Collection<BaseGraphicModel> models) {

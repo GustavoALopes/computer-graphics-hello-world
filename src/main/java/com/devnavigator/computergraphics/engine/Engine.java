@@ -2,17 +2,13 @@ package com.devnavigator.computergraphics.engine;
 
 import com.devnavigator.computergraphics.components.Point;
 import com.devnavigator.computergraphics.components.Square;
-import com.devnavigator.computergraphics.components.Triangle;
 import com.devnavigator.computergraphics.components.base.BaseGraphicModel;
+import com.devnavigator.computergraphics.engine.components.KeyboardListener;
 import com.devnavigator.computergraphics.engine.components.Renderer;
-import com.devnavigator.computergraphics.engine.components.Texture;
 import com.devnavigator.computergraphics.engine.components.Window;
-import com.devnavigator.computergraphics.engine.components.interfaces.IGraphicModel;
-import com.devnavigator.computergraphics.engine.components.math.Matrix4f;
 import com.devnavigator.computergraphics.engine.interfaces.IEngine;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL33;
-import org.lwjgl.system.MemoryStack;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +17,8 @@ public class Engine implements IEngine {
 
     private Window window;
 
+    private final KeyboardListener keyboardListener;
+
     private final Renderer renderer;
 
     private Collection<BaseGraphicModel> models;
@@ -28,10 +26,13 @@ public class Engine implements IEngine {
     private boolean isRunning;
 
     public Engine() {
+        this.keyboardListener = new KeyboardListener();
         this.renderer = new Renderer(
                 1024,
-                740
+                740,
+                this.keyboardListener
         );
+
         this.models = new ArrayList<>();
     }
 
@@ -56,6 +57,8 @@ public class Engine implements IEngine {
                 740,
                 "Hello world"
         );
+
+        this.keyboardListener.bindWindow(this.window);
 
         this.renderer.init(this.window);
 
