@@ -15,6 +15,7 @@
   <properties>
     <lwjgl.version>3.3.3</lwjgl.version>
     <lwjgl.natives>natives-windows</lwjgl.natives>
+    <javatuples.version>1.2</javatuples.version>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -33,6 +34,13 @@
   </dependencyManagement>
 
   <dependencies>
+    <dependency>
+      <groupId>org.javatuples</groupId>
+      <artifactId>javatuples</artifactId>
+      <version>${javatuples.version}</version>
+    </dependency>
+
+
     <dependency>
       <groupId>org.lwjgl</groupId>
       <artifactId>lwjgl</artifactId>

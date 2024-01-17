@@ -38,13 +38,13 @@ public class RawModel {
     }
 
     public static RawModel create(
-            final float[] position,
+            final float[] vertices,
             final int coordSize
     ) {
         final var model = new RawModel();
         model.setPosition(
                 0,
-                position,
+                vertices,
                 coordSize
         );
 
@@ -58,7 +58,7 @@ public class RawModel {
     ) {
         this.vao.bind();
 
-        final var vbo = this.getOrCreateVBO("position");
+        final var vbo = this.getOrCreateVBO("vertices");
         vbo.bind();
 
         vbo.updateData(position);
@@ -121,6 +121,31 @@ public class RawModel {
         return this;
     }
 
+    public RawModel addNormals(
+            final int shaderNormalAttrPosition,
+            final float[] normals
+    ) {
+        this.vao.bind();
+
+        final var normalsAttr = this.getOrCreateVBO("normals");
+        normalsAttr.bind();
+
+        normalsAttr.updateData(normals);
+
+        GL33.glVertexAttribPointer(
+                shaderNormalAttrPosition,
+                3,
+                GL33.GL_FLOAT,
+                false,
+                0,
+                0L
+        );
+
+        GL33.glEnableVertexAttribArray(shaderNormalAttrPosition);
+
+        return this;
+    }
+
     public RawModel changeColor(
             final int shaderIndexAttrib,
             final int[] color
@@ -148,7 +173,7 @@ public class RawModel {
     }
 
     private VertexBufferObject getOrCreateVBO(final String name) {
-        var vbo = this.vbos.get("name");
+        var vbo = this.vbos.get(name);
         if(Objects.isNull(vbo)) {
             vbo = this.createNewVBO(name);
         }

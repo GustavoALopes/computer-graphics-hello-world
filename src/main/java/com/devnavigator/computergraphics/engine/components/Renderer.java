@@ -1,8 +1,9 @@
 package com.devnavigator.computergraphics.engine.components;
 
-import com.devnavigator.computergraphics.components.base.BaseGraphicModel;
+import com.devnavigator.computergraphics.components.base.GraphicModel;
 import com.devnavigator.computergraphics.engine.components.renderer.ProgramShader;
 import com.devnavigator.computergraphics.engine.components.renderer.Shader;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL33;
 
@@ -45,13 +46,13 @@ public class Renderer {
 //        window.addCallbackListener(this.camera::move);
     }
 
-    public void render(final Collection<BaseGraphicModel> models) {
+    public void render(final Collection<GraphicModel> models) {
         models.forEach(this::render);
         this.cleanup();
     }
 
     public void render(
-        final BaseGraphicModel model
+        final GraphicModel model
     ) {
         this.program.use();
         this.camera.update(this.program);
