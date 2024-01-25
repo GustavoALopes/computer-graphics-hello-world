@@ -6,6 +6,7 @@ import com.devnavigator.computergraphics.engine.components.renderer.VertexArrayO
 import com.devnavigator.computergraphics.engine.components.renderer.VertexBufferObject;
 import org.lwjgl.opengl.GL33;
 
+import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -38,13 +39,13 @@ public class RawModel {
     }
 
     public static RawModel create(
-            final float[] position,
+            final float[] vertices,
             final int coordSize
     ) {
         final var model = new RawModel();
         model.setPosition(
                 0,
-                position,
+                vertices,
                 coordSize
         );
 
@@ -58,7 +59,7 @@ public class RawModel {
     ) {
         this.vao.bind();
 
-        final var vbo = this.getOrCreateVBO("position");
+        final var vbo = this.getOrCreateVBO("vertices");
         vbo.bind();
 
         vbo.updateData(position);
@@ -94,13 +95,16 @@ public class RawModel {
         final var textureAttrib = this.getOrCreateVBO("textureCoordinates");
         textureAttrib.bind();
 
+//        final var FloatBuffer = new FloatBuffer();
+
+
         textureAttrib.updateData(coordinates);
 
         GL33.glVertexAttribPointer(
                 shaderTextCoordsIndex,
                 2,
                 GL33.GL_FLOAT,
-                true,
+                false,
                 0,
                 0L
         );
@@ -117,6 +121,31 @@ public class RawModel {
         GL33.glEnableVertexAttribArray(
                 shaderTextCoordsIndex
         );
+
+        return this;
+    }
+
+    public RawModel addNormals(
+            final int shaderNormalAttrPosition,
+            final float[] normals
+    ) {
+        this.vao.bind();
+
+        final var normalsAttr = this.getOrCreateVBO("normals");
+        normalsAttr.bind();
+
+        normalsAttr.updateData(normals);
+
+        GL33.glVertexAttribPointer(
+                shaderNormalAttrPosition,
+                3,
+                GL33.GL_FLOAT,
+                false,
+                0,
+                0L
+        );
+
+        GL33.glEnableVertexAttribArray(shaderNormalAttrPosition);
 
         return this;
     }
@@ -148,7 +177,7 @@ public class RawModel {
     }
 
     private VertexBufferObject getOrCreateVBO(final String name) {
-        var vbo = this.vbos.get("name");
+        var vbo = this.vbos.get(name);
         if(Objects.isNull(vbo)) {
             vbo = this.createNewVBO(name);
         }

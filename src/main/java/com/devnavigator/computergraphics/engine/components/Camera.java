@@ -41,19 +41,23 @@ public class Camera {
 
     public void update(final ProgramShader programShader) {
         if(this.keyboard.isKeyDown(KeyboardListener.Key.A)) {
-            this.position.x += 0.02f;
-        }
-
-        if(this.keyboard.isKeyDown(KeyboardListener.Key.D)) {
             this.position.x -= 0.02f;
         }
 
+        if(this.keyboard.isKeyDown(KeyboardListener.Key.Q)) {
+            this.pitch += 10f;
+        }
+
+        if(this.keyboard.isKeyDown(KeyboardListener.Key.D)) {
+            this.position.x += 0.02f;
+        }
+
         if(this.keyboard.isKeyDown(KeyboardListener.Key.W)) {
-            this.position.z += 0.02f;
+            this.position.z -= 0.02f;
         }
 
         if(this.keyboard.isKeyDown(KeyboardListener.Key.S)) {
-            this.position.z -= 0.02f;
+            this.position.z += 0.02f;
         }
 
         final var viewMatrix = createViewMatrix();

@@ -1,10 +1,9 @@
 package com.devnavigator.computergraphics.components;
 
-import com.devnavigator.computergraphics.components.base.BaseGraphicModel;
+import com.devnavigator.computergraphics.components.base.GraphicModel;
 import com.devnavigator.computergraphics.components.base.RawModel;
-import com.devnavigator.computergraphics.engine.components.interfaces.IGraphicModel;
 
-public class Triangle extends BaseGraphicModel {
+public class Triangle extends GraphicModel {
 
     public Triangle(
             final float[] points

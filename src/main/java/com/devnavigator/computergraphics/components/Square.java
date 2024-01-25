@@ -1,10 +1,9 @@
 package com.devnavigator.computergraphics.components;
 
-import com.devnavigator.computergraphics.components.base.BaseGraphicModel;
+import com.devnavigator.computergraphics.components.base.GraphicModel;
 import com.devnavigator.computergraphics.components.base.RawModel;
-import com.devnavigator.computergraphics.engine.components.interfaces.IGraphicModel;
 
-public class Square extends BaseGraphicModel {
+public class Square extends GraphicModel {
 
     public Square(
             final float[] data
