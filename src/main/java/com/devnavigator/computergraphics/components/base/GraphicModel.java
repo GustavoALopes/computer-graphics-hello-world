@@ -1,5 +1,6 @@
 package com.devnavigator.computergraphics.components.base;
 
+import com.devnavigator.computergraphics.engine.components.OBJLoader;
 import com.devnavigator.computergraphics.engine.components.Texture;
 import com.devnavigator.computergraphics.engine.components.math.Matrix4f;
 import com.devnavigator.computergraphics.engine.components.math.Vector2f;
@@ -31,6 +32,9 @@ public class GraphicModel {
     ) {
         this.model = model;
         this.numVertex = numVertex;
+        this.translate = new Matrix4f();
+        this.rotate = new Matrix4f();
+        this.scale = new Matrix4f();
     }
 
     public RawModel getModel() {
@@ -152,34 +156,51 @@ public class GraphicModel {
     }
 
     public static GraphicModel loadFromObj(
+            final Path modelPath
+    ) {
+       return loadFromObj(modelPath, null);
+    }
+
+    public static GraphicModel loadFromObj(
         final Path modelPath,
         final Texture texture
     ) {
-        final var objModel = OBJModel.create(modelPath);
+        final var values = OBJLoader.loadOBJ(modelPath);
 
-        return new GraphicModel(
+        final var model = new GraphicModel(
                 RawModel.create(
-                        objModel.vertices(),
+                        values.getValue0(),
                         3
-                ).addTexture(
-                        1,
-                        texture,
-                        objModel.textureCoordinates()
                 ).addIndexBuffer(
-                        objModel.indices()
+                        values.getValue3()
                 ),
 //                .addNormals(objModel.normals()),
-                objModel.indices().length
+                values.getValue3().length
         );
+
+        if(Objects.nonNull(texture)) {
+            model.addTexture(texture, values.getValue1());
+        }
+
+        return model;
     }
 
     private record OBJModel(float[] vertices, float[] textureCoordinates, float[] normals, int[] indices) {
+        private final static int MODEL_TRIANGLE_BASE_FACE_COUNT = 3;
 
         public static OBJModel create(final Path modelPath) {
                 try (final var stream = new BufferedReader(new FileReader(modelPath.toFile()))) {
                     final var objProperties = reader(stream);
+                    final var vertices = new float[objProperties.getValue0().size() * 3];
+
+                    int vertexPointer = 0;
+                    for (final var vertex : objProperties.getValue0()) {
+                        vertices[vertexPointer++] = vertex.x;
+                        vertices[vertexPointer++] = vertex.y;
+                        vertices[vertexPointer++] = vertex.z;
+                    }
                     final var model = new OBJModel(
-                            toArrayFloat(objProperties.getValue0()),
+                            vertices,
                             toArray2DList(objProperties.getValue1()),
                             toArrayFloat(objProperties.getValue2()),
                             toArrayInt(objProperties.getValue3())
@@ -228,7 +249,7 @@ public class GraphicModel {
                             ));
                             break;
                         case "f":
-                            for (var i = 1; i <= 3; i++) {
+                            for (var i = 1; i <= MODEL_TRIANGLE_BASE_FACE_COUNT; i++) {
                                 final var faceTokens = tokens[i].split("/");
                                 final var zeroIndexBase = Integer.parseInt(faceTokens[0]) - 1;
                                 indices.add(zeroIndexBase);

@@ -15,7 +15,8 @@ public class KeyboardListener {
             Key.A, GLFW.GLFW_KEY_A,
             Key.W, GLFW.GLFW_KEY_W,
             Key.S, GLFW.GLFW_KEY_S,
-            Key.D, GLFW.GLFW_KEY_D
+            Key.D, GLFW.GLFW_KEY_D,
+            Key.Q, GLFW.GLFW_KEY_Q
     ));
 
     public KeyboardListener() {
@@ -43,7 +44,7 @@ public class KeyboardListener {
     }
 
     public enum Key {
-        A(GLFW.GLFW_KEY_A), W(GLFW.GLFW_KEY_W), S(GLFW.GLFW_KEY_S), D(GLFW.GLFW_KEY_D);
+        A(GLFW.GLFW_KEY_A), W(GLFW.GLFW_KEY_W), S(GLFW.GLFW_KEY_S), D(GLFW.GLFW_KEY_D), Q(GLFW.GLFW_KEY_Q);
 
         private int value;
 

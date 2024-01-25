@@ -44,6 +44,10 @@ public class Camera {
             this.position.x -= 0.02f;
         }
 
+        if(this.keyboard.isKeyDown(KeyboardListener.Key.Q)) {
+            this.pitch += 10f;
+        }
+
         if(this.keyboard.isKeyDown(KeyboardListener.Key.D)) {
             this.position.x += 0.02f;
         }

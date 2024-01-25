@@ -6,6 +6,7 @@ import com.devnavigator.computergraphics.engine.components.renderer.VertexArrayO
 import com.devnavigator.computergraphics.engine.components.renderer.VertexBufferObject;
 import org.lwjgl.opengl.GL33;
 
+import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -94,13 +95,16 @@ public class RawModel {
         final var textureAttrib = this.getOrCreateVBO("textureCoordinates");
         textureAttrib.bind();
 
+//        final var FloatBuffer = new FloatBuffer();
+
+
         textureAttrib.updateData(coordinates);
 
         GL33.glVertexAttribPointer(
                 shaderTextCoordsIndex,
                 2,
                 GL33.GL_FLOAT,
-                true,
+                false,
                 0,
                 0L
         );

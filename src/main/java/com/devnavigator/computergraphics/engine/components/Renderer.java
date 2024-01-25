@@ -61,6 +61,7 @@ public class Renderer {
 
 
 //        model.increasePosition(0f, 0f, -0.01f);
+        model.increaseRotation(0f, 10f, 0);
 //        model.rotate(
 //            (float)Math.toRadians(
 //                    GLFW.glfwGetTime() * 360.0

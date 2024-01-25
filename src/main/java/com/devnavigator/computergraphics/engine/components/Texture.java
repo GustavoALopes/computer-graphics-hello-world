@@ -57,7 +57,7 @@ public class Texture {
      * @param data   Pixel data of the image
      */
     public void uploadData(int width, int height, ByteBuffer data) {
-        uploadData(GL33.GL_RGBA8, width, height, GL33.GL_RGBA, data);
+        uploadData(GL33.GL_RGBA, width, height, GL33.GL_RGBA, data);
     }
 
     /**
@@ -137,12 +137,22 @@ public class Texture {
 
         texture.bind();
 
+        /**
+         * GL_TEXTURE_WRAP: Determine how the texture will be wrapper, if should repeat or clamped when texture
+         * coordinates go beyond the range [0, 1]
+         * S: Horizontal
+         * T: Vertical
+        */
         texture.setParameter(GL33.GL_TEXTURE_WRAP_S, GL33.GL_CLAMP_TO_BORDER);
         texture.setParameter(GL33.GL_TEXTURE_WRAP_T, GL33.GL_CLAMP_TO_BORDER);
-        texture.setParameter(GL33.GL_TEXTURE_MIN_FILTER, GL33.GL_NEAREST);
-        texture.setParameter(GL33.GL_TEXTURE_MAG_FILTER, GL33.GL_NEAREST);
+        /**
+         * GL_TEXTURE_MIN_FILTER: Configure the filter when the texture is viewed at smaller size(minification)
+         * GL_TEXTURE_MAG_FILTER: The same above buts for large size(magnification)
+         */
+        texture.setParameter(GL33.GL_TEXTURE_MIN_FILTER, GL33.GL_LINEAR);
+        texture.setParameter(GL33.GL_TEXTURE_MAG_FILTER, GL33.GL_LINEAR);
 
-        texture.uploadData(GL33.GL_RGBA8, width, height, GL33.GL_RGBA, data);
+        texture.uploadData(GL33.GL_RGBA, width, height, GL33.GL_RGBA, data);
 
         return texture;
     }
@@ -164,7 +174,6 @@ public class Texture {
             final var comp = stack.mallocInt(1);
 
             /* Load image */
-            STBImage.stbi_set_flip_vertically_on_load(true);
             image = STBImage.stbi_load(
                     path,
                     w,
