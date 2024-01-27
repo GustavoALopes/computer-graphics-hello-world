@@ -28,7 +28,7 @@ void main() {
 
     float specularFactor = max(dot(reflectedLightDirection, normalizedCameraVector), 0.0);
     float dumpedFactor = pow(specularFactor, shineDamper);
-    vec3 finalSpecular = dumpedFactor * lightColor;
+    vec3 finalSpecular = dumpedFactor * reflectivity * lightColor;
 
     fragColor = vec4(difusse, 1.0) * texture(textureSampler, textCoordsOut) + vec4(finalSpecular, 1.0);
 }
