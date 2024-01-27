@@ -1,14 +1,11 @@
 package com.devnavigator.computergraphics.engine;
 
-import com.devnavigator.computergraphics.components.Point;
-import com.devnavigator.computergraphics.components.Square;
+import com.devnavigator.computergraphics.components.Light;
 import com.devnavigator.computergraphics.components.base.GraphicModel;
-import com.devnavigator.computergraphics.components.base.RawModel;
 import com.devnavigator.computergraphics.engine.components.*;
+import com.devnavigator.computergraphics.engine.components.colors.ColorEnum;
+import com.devnavigator.computergraphics.engine.components.math.Vector3f;
 import com.devnavigator.computergraphics.engine.interfaces.IEngine;
-import org.javatuples.Quartet;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL33;
 
 import java.nio.file.Path;
@@ -25,6 +22,8 @@ public class Engine implements IEngine {
 
     private Collection<GraphicModel> models;
 
+    private Collection<Light> lights;
+
     private boolean isRunning;
 
     public Engine() {
@@ -36,6 +35,7 @@ public class Engine implements IEngine {
         );
 
         this.models = new ArrayList<>();
+        this.lights = new ArrayList<>();
     }
 
     public void start() {
@@ -86,11 +86,18 @@ public class Engine implements IEngine {
 //        );
 
         final var model = GraphicModel.loadFromObj(
-                Path.of("src/main/resources/models/stall/stall.obj"),
-                Texture.loadTexture("src/main/resources/models/stall/stallTexture.png")
+                Path.of("src/main/resources/models/dragon.obj"),
+                Texture.loadTexture("src/main/resources/textures/white-texture.png")
         );
+
+        final var light = Light.create(
+                new Vector3f(0, 0, -20f),
+                ColorEnum.WHITE.getValue()
+        );
+
         model.increasePosition(0, 0, -30f);
         this.models.add(model);
+        this.lights.add(light);
 
 
 //        this.models.add(Triangle.create(
@@ -122,7 +129,8 @@ public class Engine implements IEngine {
             GL33.glClear(GL33.GL_COLOR_BUFFER_BIT|GL33.GL_DEPTH_BUFFER_BIT);
 
             this.renderer.render(
-                this.models
+                this.models,
+                this.lights
             );
 
             this.window.update();

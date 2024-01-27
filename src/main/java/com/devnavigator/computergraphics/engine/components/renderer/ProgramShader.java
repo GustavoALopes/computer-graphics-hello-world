@@ -1,6 +1,7 @@
 package com.devnavigator.computergraphics.engine.components.renderer;
 
 import com.devnavigator.computergraphics.engine.components.math.Matrix4f;
+import com.devnavigator.computergraphics.engine.components.math.Vector3f;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL33;
 import org.lwjgl.system.MemoryStack;
@@ -72,5 +73,9 @@ public class ProgramShader {
             value.toBuffer(buffer);
             GL33.glUniformMatrix4fv(location, false, buffer);
         }
+    }
+
+    public void updateUniformValue(final int location, final Vector3f vector) {
+        GL33.glUniform3f(location, vector.x, vector.y, vector.z);
     }
 }

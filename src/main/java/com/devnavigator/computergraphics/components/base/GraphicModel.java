@@ -173,8 +173,8 @@ public class GraphicModel {
                         3
                 ).addIndexBuffer(
                         values.getValue3()
-                ),
-//                .addNormals(objModel.normals()),
+                )
+                .addNormals(3, values.getValue2()),
                 values.getValue3().length
         );
 

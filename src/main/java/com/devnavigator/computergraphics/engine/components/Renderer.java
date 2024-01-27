@@ -1,9 +1,9 @@
 package com.devnavigator.computergraphics.engine.components;
 
+import com.devnavigator.computergraphics.components.Light;
 import com.devnavigator.computergraphics.components.base.GraphicModel;
 import com.devnavigator.computergraphics.engine.components.renderer.ProgramShader;
 import com.devnavigator.computergraphics.engine.components.renderer.Shader;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL33;
 
@@ -46,13 +46,20 @@ public class Renderer {
 //        window.addCallbackListener(this.camera::move);
     }
 
-    public void render(final Collection<GraphicModel> models) {
-        models.forEach(this::render);
+    public void render(
+            final Collection<GraphicModel> models,
+            final Collection<Light> lights
+    ) {
+        final var light = lights.stream().findFirst().orElse(null);
+        models.forEach(entity -> {
+            this.render(entity, light);
+        });
         this.cleanup();
     }
 
     public void render(
-        final GraphicModel model
+        final GraphicModel model,
+        final Light light
     ) {
         this.program.use();
         this.camera.update(this.program);
@@ -69,10 +76,23 @@ public class Renderer {
 //        );
 
         final var location = this.program.getUniformLocation("transformationMatrix");
+        final var lightPosition = this.program.getUniformLocation("lightPosition");
+        final var lightColor = this.program.getUniformLocation("lightColor");
 
         this.program.updateUniformValue(
                 location,
                 model.render()
+        );
+
+
+        this.program.updateUniformValue(
+                lightPosition,
+                light.getPosition()
+        );
+
+        this.program.updateUniformValue(
+                lightColor,
+                light.getColor()
         );
 
         this.flush(model.getNumVertex());
