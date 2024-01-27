@@ -14,6 +14,7 @@ out vec3 colorOut;
 out vec2 textCoordsOut;
 out vec3 surfaceNormalOut;
 out vec3 toLightVectorOut;
+out vec3 toCameraVectorOut;
 
 void main() {
         colorOut = colorIn;
@@ -24,4 +25,5 @@ void main() {
 
         surfaceNormalOut = (transformationMatrix * vec4(normalsIn, 0.0)).xyz;
         toLightVectorOut = lightPosition - worldPosition.xyz;
+        toCameraVectorOut = (inverse(viewMatrix) * vec4(0.0, 0.0, 0.0, 1.0)).xyz - worldPosition.xyz;
 }

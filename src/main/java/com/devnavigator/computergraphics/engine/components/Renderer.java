@@ -78,6 +78,8 @@ public class Renderer {
         final var location = this.program.getUniformLocation("transformationMatrix");
         final var lightPosition = this.program.getUniformLocation("lightPosition");
         final var lightColor = this.program.getUniformLocation("lightColor");
+        final var shineDamper = this.program.getUniformLocation("shineDamper");
+        final var reflectivity = this.program.getUniformLocation("reflectivity");
 
         this.program.updateUniformValue(
                 location,
@@ -93,6 +95,16 @@ public class Renderer {
         this.program.updateUniformValue(
                 lightColor,
                 light.getColor()
+        );
+
+        this.program.updateUniformValue(
+                shineDamper,
+                model.getShineDamper()
+        );
+
+        this.program.updateUniformValue(
+                reflectivity,
+                model.getReflectivity()
         );
 
         this.flush(model.getNumVertex());

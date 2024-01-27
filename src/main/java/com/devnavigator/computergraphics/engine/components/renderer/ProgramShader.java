@@ -75,6 +75,11 @@ public class ProgramShader {
         }
     }
 
+    public void updateUniformValue(final int location, final float value) {
+        GL33.glUniform1f(location, value);
+    }
+
+
     public void updateUniformValue(final int location, final Vector3f vector) {
         GL33.glUniform3f(location, vector.x, vector.y, vector.z);
     }

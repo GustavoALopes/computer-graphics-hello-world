@@ -87,7 +87,9 @@ public class Engine implements IEngine {
 
         final var model = GraphicModel.loadFromObj(
                 Path.of("src/main/resources/models/dragon.obj"),
-                Texture.loadTexture("src/main/resources/textures/white-texture.png")
+                Texture.loadTexture("src/main/resources/textures/white-texture.png"),
+                10,
+                1
         );
 
         final var light = Light.create(

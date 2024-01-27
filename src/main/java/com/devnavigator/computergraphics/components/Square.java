@@ -17,7 +17,9 @@ public class Square extends GraphicModel {
                     0, 1, 3,
                     3, 1, 2
             }),
-            6
+            6,
+                1,
+                0
         );
     }
 

@@ -16,7 +16,9 @@ public class Triangle extends GraphicModel {
             .addIndexBuffer(new int[]{
                     0, 1, 2
             }),
-            3
+            3,
+                1,
+                0
         );
     }
 

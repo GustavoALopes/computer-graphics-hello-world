@@ -18,6 +18,10 @@ public class GraphicModel {
 
     protected final RawModel model;
 
+    private float shineDamper;
+
+    private float reflectivity;
+
     private final int numVertex;
 
     private Matrix4f translate;
@@ -28,13 +32,18 @@ public class GraphicModel {
 
     public GraphicModel(
             final RawModel model,
-            final int numVertex
+            final int numVertex,
+            final float shineDamper,
+            final float reflectivity
     ) {
         this.model = model;
         this.numVertex = numVertex;
         this.translate = new Matrix4f();
         this.rotate = new Matrix4f();
         this.scale = new Matrix4f();
+
+        this.shineDamper = shineDamper;
+        this.reflectivity = reflectivity;
     }
 
     public RawModel getModel() {
@@ -43,6 +52,14 @@ public class GraphicModel {
 
     public int getNumVertex() {
         return this.numVertex;
+    }
+
+    public float getShineDamper() {
+        return shineDamper;
+    }
+
+    public float getReflectivity() {
+        return reflectivity;
     }
 
     public GraphicModel addTexture(
@@ -162,8 +179,17 @@ public class GraphicModel {
     }
 
     public static GraphicModel loadFromObj(
+            final Path modelPath,
+            final Texture texture
+    ) {
+        return loadFromObj(modelPath, texture, 1, 0);
+    }
+
+    public static GraphicModel loadFromObj(
         final Path modelPath,
-        final Texture texture
+        final Texture texture,
+        final float shineDamper,
+        final float reflectivity
     ) {
         final var values = OBJLoader.loadOBJ(modelPath);
 
@@ -175,7 +201,9 @@ public class GraphicModel {
                         values.getValue3()
                 )
                 .addNormals(3, values.getValue2()),
-                values.getValue3().length
+                values.getValue3().length,
+                shineDamper,
+                reflectivity
         );
 
         if(Objects.nonNull(texture)) {
