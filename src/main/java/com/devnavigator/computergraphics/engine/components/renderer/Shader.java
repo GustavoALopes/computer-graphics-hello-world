@@ -41,7 +41,7 @@ public class Shader {
     }
 
     public static Shader loadShader(
-            final int type,
+            final Type type,
             final String path
     ) {
         final var script = new StringBuffer(100);
@@ -66,10 +66,10 @@ public class Shader {
     }
 
     private static Shader createShader(
-            final int type,
-            final CharSequence source
+        final Type type,
+        final CharSequence source
     ) {
-        final var shader = new Shader(type);
+        final var shader = new Shader(type.getValue());
         shader.source(source);
         shader.compile();
 
@@ -78,5 +78,20 @@ public class Shader {
 
     public void delete() {
         GL33.glDeleteShader(this.id);
+    }
+
+    public enum Type {
+        VERTEX(GL33.GL_VERTEX_SHADER),
+        FRAGMENT(GL33.GL_FRAGMENT_SHADER);
+
+        private int value;
+
+        Type(final int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
     }
 }

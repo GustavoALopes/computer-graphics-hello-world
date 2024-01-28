@@ -5,7 +5,10 @@ import com.devnavigator.computergraphics.components.base.GraphicModel;
 import com.devnavigator.computergraphics.engine.components.*;
 import com.devnavigator.computergraphics.engine.components.colors.ColorEnum;
 import com.devnavigator.computergraphics.engine.components.math.Vector3f;
+import com.devnavigator.computergraphics.engine.components.renderer.ProgramShader;
+import com.devnavigator.computergraphics.engine.components.renderer.Shader;
 import com.devnavigator.computergraphics.engine.interfaces.IEngine;
+import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL33;
 
 import java.nio.file.Path;
@@ -14,7 +17,7 @@ import java.util.Collection;
 
 public class Engine implements IEngine {
 
-    private Window window;
+    private final Window window;
 
     private final KeyboardListener keyboardListener;
 
@@ -28,6 +31,12 @@ public class Engine implements IEngine {
 
     public Engine() {
         this.keyboardListener = new KeyboardListener();
+        this.window = new Window(
+                1024,
+                740,
+                "Hello world"
+        );
+
         this.renderer = new Renderer(
                 1024,
                 740,
@@ -54,15 +63,21 @@ public class Engine implements IEngine {
     }
 
     private void init() {
-        this.window = new Window(
-                1024,
-                740,
-                "Hello world"
-        );
-
         this.keyboardListener.bindWindow(this.window);
 
-        this.renderer.init(this.window);
+        final var program = new ProgramShader();
+        program.attachShader(Shader.loadShader(
+                Shader.Type.VERTEX,
+                "src/main/resources/shaders/default.vert"
+        ));
+
+        program.attachShader(Shader.loadShader(
+                Shader.Type.FRAGMENT,
+                "src/main/resources/shaders/default.frag"
+        ));
+
+        this.renderer.attachProgramShader(program);
+        this.renderer.init();
 
 //        this.models.add(Square.create(
 //                Point.create(-0.5f, 0.5f),
@@ -86,10 +101,10 @@ public class Engine implements IEngine {
 //        );
 
         final var model = GraphicModel.loadFromObj(
-                Path.of("src/main/resources/models/dragon.obj"),
-                Texture.loadTexture("src/main/resources/textures/white-texture.png"),
+                Path.of("src/main/resources/models/stall.obj"),
+                Texture.loadTexture("src/main/resources/textures/stall-texture.png"),
                 10,
-                1
+                0
         );
 
         final var light = Light.create(
@@ -98,6 +113,7 @@ public class Engine implements IEngine {
         );
 
         model.increasePosition(0, 0, -30f);
+        model.increaseRotation(0, 30f, 0);
         this.models.add(model);
         this.lights.add(light);
 

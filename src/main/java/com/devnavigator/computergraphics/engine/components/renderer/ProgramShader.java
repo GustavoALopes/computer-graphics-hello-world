@@ -12,7 +12,7 @@ public class ProgramShader {
 
 
     public ProgramShader() {
-        this.id = GL30.glCreateProgram();
+        this.id = GL33.glCreateProgram();
     }
 
     public void attachShader(final Shader shader) {
@@ -20,6 +20,8 @@ public class ProgramShader {
                 this.id,
                 shader.getId()
         );
+
+        shader.delete();
     }
 
     public void link() {

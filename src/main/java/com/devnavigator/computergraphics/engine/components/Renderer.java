@@ -11,8 +11,6 @@ import java.util.Collection;
 
 public class Renderer {
 
-    private int numVertex;
-
     private final Projection projection;
 
     private final Camera camera;
@@ -25,7 +23,7 @@ public class Renderer {
             final float displayHeight,
             final KeyboardListener keyboardListener
     ) {
-        this.numVertex = 0;
+        GL.createCapabilities();
 //        this.buffer = BufferUtils.createFloatBuffer(4096);
         this.projection = Projection.create(
                 displayWidth,
@@ -35,15 +33,20 @@ public class Renderer {
         this.camera = new Camera(keyboardListener);
     }
 
-    public void init(final Window window) {
-        GL.createCapabilities();
-
-        this.program = compileAndLinkShaders();
-        this.program.use();
-
+    public void init() {
+        this.enableCullFace(GL33.GL_BACK);
         this.projection.init(this.program);
+    }
 
-//        window.addCallbackListener(this.camera::move);
+    public void attachProgramShader(final ProgramShader programShader) {
+        this.program = programShader;
+        this.program.link();
+        this.program.use();
+    }
+
+    private void enableCullFace(final int mode) {
+        GL33.glEnable(GL33.GL_CULL_FACE);
+        GL33.glCullFace(mode);
     }
 
     public void render(
@@ -61,14 +64,13 @@ public class Renderer {
         final GraphicModel model,
         final Light light
     ) {
-        this.program.use();
         this.camera.update(this.program);
 
         GL33.glBindVertexArray(model.getModel().getVaoId());
 
 
 //        model.increasePosition(0f, 0f, -0.01f);
-        model.increaseRotation(0f, 10f, 0);
+//        model.increaseRotation(0f, 10f, 0);
 //        model.rotate(
 //            (float)Math.toRadians(
 //                    GLFW.glfwGetTime() * 360.0
@@ -121,35 +123,11 @@ public class Renderer {
 
     private void cleanup() {
 //        this.program.disableVertexAttribArray(0);
-        this.numVertex = 0;
         GL33.glBindVertexArray(0);
     }
 
 
     public void dispose() {
         this.program.dispose();
-    }
-
-    private ProgramShader compileAndLinkShaders() {
-        final var vertexShader = Shader.loadShader(
-                GL33.GL_VERTEX_SHADER,
-                "src/main/resources/shaders/default.vert"
-        );
-
-        final var fragmentShader = Shader.loadShader(
-                GL33.GL_FRAGMENT_SHADER,
-                "src/main/resources/shaders/default.frag"
-        );
-
-        final var program = new ProgramShader();
-        program.attachShader(vertexShader);
-        program.attachShader(fragmentShader);
-        program.link();
-        program.use();
-
-        vertexShader.delete();
-        fragmentShader.delete();
-
-        return program;
     }
 }
