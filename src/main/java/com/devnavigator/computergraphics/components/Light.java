@@ -1,6 +1,6 @@
 package com.devnavigator.computergraphics.components;
 
-import com.devnavigator.computergraphics.engine.components.math.Vector3f;
+import org.joml.Vector3f;
 
 public class Light {
 

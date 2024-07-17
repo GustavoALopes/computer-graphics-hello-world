@@ -6,19 +6,16 @@ uniform mat4 viewMatrix;
 uniform vec3 lightPosition;
 
 layout(location=0) in vec3 position;
-layout(location=1) in vec3 colorIn;
-layout(location=2) in vec2 textCoordsIn;
-layout(location=3) in vec3 normalsIn;
+layout(location=1) in vec2 textCoordsIn;
+layout(location=2) in vec3 normalsIn;
 
-out vec3 colorOut;
 out vec2 textCoordsOut;
 out vec3 surfaceNormalOut;
 out vec3 toLightVectorOut;
 out vec3 toCameraVectorOut;
 
 void main() {
-        colorOut = colorIn;
-        textCoordsOut = textCoordsIn;
+        textCoordsOut = textCoordsIn * 40.0;
 
         vec4 worldPosition = transformationMatrix * vec4(position, 1.0f);
         gl_Position = projectionMatrix * viewMatrix * worldPosition;

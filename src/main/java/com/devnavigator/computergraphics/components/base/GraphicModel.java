@@ -2,10 +2,10 @@ package com.devnavigator.computergraphics.components.base;
 
 import com.devnavigator.computergraphics.engine.components.OBJLoader;
 import com.devnavigator.computergraphics.engine.components.Texture;
-import com.devnavigator.computergraphics.engine.components.math.Matrix4f;
-import com.devnavigator.computergraphics.engine.components.math.Vector2f;
-import com.devnavigator.computergraphics.engine.components.math.Vector3f;
 import org.javatuples.Quartet;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -24,11 +24,13 @@ public class GraphicModel {
 
     private final int numVertex;
 
+    private Vector3f position;
+
     private Matrix4f translate;
 
-    private Matrix4f scale;
+    private float scale;
 
-    private Matrix4f rotate;
+    private Vector3f rotate;
 
     public GraphicModel(
             final RawModel model,
@@ -38,12 +40,37 @@ public class GraphicModel {
     ) {
         this.model = model;
         this.numVertex = numVertex;
+        this.position = new Vector3f();
         this.translate = new Matrix4f();
-        this.rotate = new Matrix4f();
-        this.scale = new Matrix4f();
+        this.rotate = new Vector3f(0, 0, 0);
+        this.scale = 1f;
 
         this.shineDamper = shineDamper;
         this.reflectivity = reflectivity;
+    }
+
+    public static GraphicModel create(
+            final Quartet<float[], float[], float[], int[]> rawModel,
+            final Texture texture
+    ) {
+        final var model = new GraphicModel(
+                RawModel.create(
+                        rawModel.getValue0(),
+                        3
+                ).addIndexBuffer(
+                        rawModel.getValue3()
+                )
+                .addNormals(3, rawModel.getValue2()),
+                rawModel.getValue3().length,
+                1,
+                0
+        );
+
+        if(Objects.nonNull(texture)) {
+            model.addTexture(texture, rawModel.getValue1());
+        }
+
+        return model;
     }
 
     public RawModel getModel() {
@@ -84,17 +111,17 @@ public class GraphicModel {
         return this;
     }
 
-    public GraphicModel rotate(
-            final float angle
-    ) {
-        this.rotate = Matrix4f.rotate(
-                angle,
-                0f,
-                0f,
-                1f
-        );
-        return this;
-    }
+//    public GraphicModel rotate(
+//            final float angle
+//    ) {
+//        this.rotate = new Matrix4f().rotate(
+//                angle,
+//                0f,
+//                0f,
+//                1f
+//        );
+//        return this;
+//    }
 
     public GraphicModel changeColor(
             final int shaderIndexAttrib,
@@ -124,26 +151,57 @@ public class GraphicModel {
         return this.changeColor(shaderIndexAttrib, new int[]{ red, green, blue });
     }
 
-    public GraphicModel changeScale(final float x, final float y, final float z) {
-        this.scale = Matrix4f.scale(x, y, z);
+    public GraphicModel changeScale(final float scale) {
+        this.scale = scale;
         return this;
     }
 
     public GraphicModel translate(final float x, final float y, final float z) {
-        this.translate = Matrix4f.translate(x, y, z);
+//        this.position = new Vector3f(x, y, z);
+//        this.translate = new Matrix4f().translate(new Vector3f(x, y, z));
+        this.position.x += x;
+        this.position.y += y;
+        this.position.z += z;
         return this;
     }
 
-    public Matrix4f render() {
-        var matrix = Optional.ofNullable(this.translate)
-                .orElse(new Matrix4f());
+    public Matrix4f getTransformationMatrix() {
+        var matrix = new Matrix4f();
+//        matrix.setIdentity();
 
-        if(!Objects.isNull(this.rotate)) {
-            matrix = matrix.multiply(this.rotate);
-        }
-        if(!Objects.isNull(this.scale)) {
-            matrix = matrix.multiply(this.scale);
-        }
+        matrix.translate(this.position);
+//        var matrix = Optional.ofNullable(this.translate)
+//                .orElse(new Matrix4f());
+//        final var tranformationMatrix = new Matrix4f();
+//        tranformationMatrix.setIdentity();
+
+        //Translate
+//        tranformationMatrix.multiply(new Vector4f(this.position.x, this.position.y, this.position.z, 0));
+
+
+        //Rotate
+//        if(Objects.nonNull(this.rotate)) {
+//            tranformationMatrix.multiply(this.rotate);
+//        }
+//
+//        if(Objects.nonNull(this.scale)) {
+//            tranformationMatrix.multiply(this.scale);
+//        }
+
+//        if(!Objects.isNull(this.rotate)) {
+//            final var angleVector = new Vector3f(
+//                (float)Math.toRadians(this.rotate.x),
+//                (float)Math.toRadians(this.rotate.y),
+//                (float)Math.toRadians(this.rotate.z)
+//            );
+//            matrix.rotate(angleVector);
+            matrix.rotate((float)Math.toRadians(this.rotate.x), new Vector3f(1, 0, 0), matrix);
+            matrix.rotate((float)Math.toRadians(this.rotate.y), new Vector3f(0, 1, 0), matrix);
+            matrix.rotate((float)Math.toRadians(this.rotate.z), new Vector3f(0, 0, 1), matrix);
+//        }
+
+        matrix.scale(this.scale);
+
 
         return matrix;
     }
@@ -153,7 +211,12 @@ public class GraphicModel {
             final float y,
             final float z
     ) {
-        this.translate = this.translate.multiply(Matrix4f.translate(x, y, z));
+//        this.translate = this.translate.translate(x, y, z);
+//        this.translate = this.translate.translate(Matrix4f.translate(x, y, z));
+//        this.position = this.position.add(new Vector3f(x, y, z));
+        this.position.x += x;
+        this.position.y += y;
+        this.position.z += z;
         return this;
     }
 
@@ -162,13 +225,23 @@ public class GraphicModel {
             final float y,
             final float z
     ) {
-        this.rotate = Optional.ofNullable(this.rotate)
-                .orElse(new Matrix4f());
+//        this.rotate((float)Math.toRadians(x))
+//            .rotate((float)Math.toRadians(y))
+//            .rotate((float)Math.toRadians(z));
 
-        this.rotate = this.rotate.multiply(Matrix4f.rotate((float)Math.toRadians(x), 1,  0, 0));
-        this.rotate = this.rotate.multiply(Matrix4f.rotate((float)Math.toRadians(y), 0, 1, 0));
-        this.rotate = this.rotate.multiply(Matrix4f.rotate((float)Math.toRadians(z), 0, 0, 1));
+        this.rotate.x += x;
+        this.rotate.y += y;
+        this.rotate.z += z;
 
+//        this.rotate = this.rotate.multiply(Matrix4f.rotate((float)Math.toRadians(x), 1,  0, 0));
+//        this.rotate = this.rotate.multiply(Matrix4f.rotate((float)Math.toRadians(y), 0, 1, 0));
+//        this.rotate = this.rotate.multiply(Matrix4f.rotate((float)Math.toRadians(z), 0, 0, 1));
+
+        return this;
+    }
+
+    public GraphicModel setPosition(final Vector3f vector3f) {
+        this.position = vector3f;
         return this;
     }
 

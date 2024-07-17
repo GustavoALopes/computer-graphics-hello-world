@@ -2,52 +2,67 @@ package com.devnavigator.computergraphics.components;
 
 import com.devnavigator.computergraphics.components.base.GraphicModel;
 import com.devnavigator.computergraphics.components.base.RawModel;
+import com.devnavigator.computergraphics.engine.components.Texture;
 import org.javatuples.Quartet;
+import org.joml.Vector3f;
 
 public class Terrain extends GraphicModel {
 
-    private static final int VERTEX_COUNT = 128;
+    private static final int TERRAIN_SIZE = 240;
 
     private float x;
 
-    private float y;
+    private float z;
 
     public Terrain(
             final float x,
-            final float y,
+            final float z,
             final float[] vertices,
             final float[] textureCoord,
             final float[] normals,
-            final int[] indices
+            final int[] indices,
+            final Texture texture
     ) {
         super(
                 RawModel.create(
                         vertices,
                         3
                 )
-//                .addTexture(2, textureCoord)
-                .addNormals(3, normals)
+                .addTexture(1, texture, textureCoord)
+                .addNormals(2, normals)
                 .addIndexBuffer(indices),
-                VERTEX_COUNT,
+                indices.length,
                 0,
                 0
         );
 
+        this.setPosition(new Vector3f(x, 0, z));
+
         this.x = x;
-        this.y = y;
+        this.z = z;
     }
 
     public static Terrain create(
             final float size
     ) {
+        return create(0, 0, size, null);
+    }
+
+    public static Terrain create(
+            final float x,
+            final float z,
+            final float size,
+            final Texture texture
+    ) {
         final var terrainInfo = generateTerrain(size);
         final var terrain = new Terrain(
-                0,
-                0,
+                x * size,
+                z * size,
                 terrainInfo.getValue0(),
                 terrainInfo.getValue1(),
                 terrainInfo.getValue2(),
-                terrainInfo.getValue3()
+                terrainInfo.getValue3(),
+                texture
         );
         return terrain;
     }
@@ -55,45 +70,37 @@ public class Terrain extends GraphicModel {
     private static Quartet<float[], float[], float[], int[]> generateTerrain(
             final float size
     ){
-        int vertexCount = VERTEX_COUNT * VERTEX_COUNT;
+        int vertexCount = TERRAIN_SIZE * TERRAIN_SIZE;
         float[] vertices = new float[vertexCount * 3];
         float[] normals = new float[vertexCount * 3];
-        float[] textureCoords = new float[vertexCount * 2];
-        int[] indices = new int[6 * (VERTEX_COUNT - 1) * (VERTEX_COUNT - 1)];
+        float[] textureCoords = new float[vertexCount*2];
+        int[] indices = new int[6*(TERRAIN_SIZE -1)*(TERRAIN_SIZE -1)];
+
         int vertexPointer = 0;
+        for(int row = 0; row < TERRAIN_SIZE; row++){
+            for(int column = 0; column < TERRAIN_SIZE; column++){
+                vertices[vertexPointer*3] = (float)column/((float) TERRAIN_SIZE - 1) * size;
+                vertices[vertexPointer*3+1] = 0;
+                vertices[vertexPointer*3+2] = (float)row/((float) TERRAIN_SIZE - 1) * size;
 
-        for (int row = 0; row < VERTEX_COUNT; row++) {
-            for (int col = 0; col < VERTEX_COUNT; col++) {
-                float x = (float) col / (VERTEX_COUNT - 1) * size;
-                float y = 0;
-                float z = (float) row / (VERTEX_COUNT - 1) * size;
+                normals[vertexPointer*3] = 0;
+                normals[vertexPointer*3+1] = 1;
+                normals[vertexPointer*3+2] = 0;
 
-                int normalPointer = vertexPointer * 3;
-                int texturePointer = vertexPointer * 2;
-
-                vertices[normalPointer] = x;
-                vertices[normalPointer + 1] = y;
-                vertices[normalPointer + 2] = z;
-
-                normals[normalPointer] = 0;
-                normals[normalPointer + 1] = 1;
-                normals[normalPointer + 2] = 0;
-
-                textureCoords[texturePointer] = (float) col / (VERTEX_COUNT - 1);
-                textureCoords[texturePointer + 1] = (float) row / (VERTEX_COUNT - 1);
+                textureCoords[vertexPointer*2] = (float)column/((float) TERRAIN_SIZE - 1f);
+                textureCoords[vertexPointer*2+1] = (float)row/((float) TERRAIN_SIZE - 1f);
 
                 vertexPointer++;
             }
         }
 
         int pointer = 0;
-        for (int row = 0; row < VERTEX_COUNT - 1; row++) {
-            for (int col = 0; col < VERTEX_COUNT - 1; col++) {
-                int topLeft = (row * VERTEX_COUNT) + col;
+        for(int gz = 0; gz< TERRAIN_SIZE -1; gz++){
+            for(int gx = 0; gx< TERRAIN_SIZE -1; gx++){
+                int topLeft = (gz* TERRAIN_SIZE)+gx;
                 int topRight = topLeft + 1;
-                int bottomLeft = ((row + 1) * VERTEX_COUNT) + col;
+                int bottomLeft = ((gz+1)* TERRAIN_SIZE)+gx;
                 int bottomRight = bottomLeft + 1;
-
                 indices[pointer++] = topLeft;
                 indices[pointer++] = bottomLeft;
                 indices[pointer++] = topRight;

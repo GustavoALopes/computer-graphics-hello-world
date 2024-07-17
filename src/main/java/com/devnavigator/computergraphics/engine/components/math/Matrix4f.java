@@ -366,6 +366,25 @@ public class Matrix4f {
     }
 
     /**
+     * Translate the source matrix and stash the result in the destination matrix
+     * @param vec The vector to translate by
+     * @param src The source matrix
+     * @param dest The destination matrix or null if a new matrix is to be created
+     * @return The translated matrix
+     */
+    public static Matrix4f translate(Vector3f vec, Matrix4f src, Matrix4f dest) {
+        if (dest == null)
+            dest = new Matrix4f();
+
+        dest.m30 += src.m00 * vec.x + src.m10 * vec.y + src.m20 * vec.z;
+        dest.m31 += src.m01 * vec.x + src.m11 * vec.y + src.m21 * vec.z;
+        dest.m32 += src.m02 * vec.x + src.m12 * vec.y + src.m22 * vec.z;
+        dest.m33 += src.m03 * vec.x + src.m13 * vec.y + src.m23 * vec.z;
+
+        return dest;
+    }
+
+    /**
      * Creates a rotation matrix. Similar to
      * <code>glRotate(angle, x, y, z)</code>.
      *

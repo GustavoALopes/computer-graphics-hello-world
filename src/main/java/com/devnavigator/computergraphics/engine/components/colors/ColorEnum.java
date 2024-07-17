@@ -1,6 +1,7 @@
 package com.devnavigator.computergraphics.engine.components.colors;
 
-import com.devnavigator.computergraphics.engine.components.math.Vector3f;
+
+import org.joml.Vector3f;
 
 public enum ColorEnum {
     WHITE(new Vector3f(1f, 1f, 1f));

@@ -34,22 +34,8 @@ public class RawModel {
         return this.vbos.get(type).getId();
     }
 
-    public static RawModel create() {
-        return new RawModel();
-    }
-
-    public static RawModel create(
-            final float[] vertices,
-            final int coordSize
-    ) {
-        final var model = new RawModel();
-        model.setPosition(
-                0,
-                vertices,
-                coordSize
-        );
-
-        return model;
+    public Texture getTexture() {
+        return this.texture;
     }
 
     public RawModel setPosition(
@@ -114,12 +100,12 @@ public class RawModel {
         GL33.glActiveTexture(GL33.GL_TEXTURE0);
 
         GL33.glBindTexture(
-                GL33.GL_TEXTURE_2D,
-                texture.getId()
+            GL33.GL_TEXTURE_2D,
+            texture.getId()
         );
 
         GL33.glEnableVertexAttribArray(
-                shaderTextCoordsIndex
+            shaderTextCoordsIndex
         );
 
         return this;
@@ -189,5 +175,23 @@ public class RawModel {
         final var vbo = new VertexBufferObject();
         this.vbos.put(name, vbo);
         return vbo;
+    }
+
+    public static RawModel create() {
+        return new RawModel();
+    }
+
+    public static RawModel create(
+            final float[] vertices,
+            final int coordSize
+    ) {
+        final var model = new RawModel();
+        model.setPosition(
+                0,
+                vertices,
+                coordSize
+        );
+
+        return model;
     }
 }

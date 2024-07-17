@@ -1,19 +1,22 @@
 package com.devnavigator.computergraphics.engine;
 
 import com.devnavigator.computergraphics.components.Light;
+import com.devnavigator.computergraphics.components.Point;
+import com.devnavigator.computergraphics.components.Square;
+import com.devnavigator.computergraphics.components.Terrain;
 import com.devnavigator.computergraphics.components.base.GraphicModel;
 import com.devnavigator.computergraphics.engine.components.*;
 import com.devnavigator.computergraphics.engine.components.colors.ColorEnum;
-import com.devnavigator.computergraphics.engine.components.math.Vector3f;
+import com.devnavigator.computergraphics.engine.components.renderer.EntityShader;
 import com.devnavigator.computergraphics.engine.components.renderer.ProgramShader;
 import com.devnavigator.computergraphics.engine.components.renderer.Shader;
+import com.devnavigator.computergraphics.engine.components.renderer.TerrainShader;
 import com.devnavigator.computergraphics.engine.interfaces.IEngine;
-import org.lwjgl.opengl.GL;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL33;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 public class Engine implements IEngine {
 
@@ -23,17 +26,21 @@ public class Engine implements IEngine {
 
     private final Renderer renderer;
 
-    private Collection<GraphicModel> models;
+    private GraphicModel modelTest;
 
-    private Collection<Light> lights;
+    private Map<Texture, List<GraphicModel>> models;
+
+    private List<Light> lights;
+
+    private List<Terrain> terrains;
 
     private boolean isRunning;
 
     public Engine() {
         this.keyboardListener = new KeyboardListener();
         this.window = new Window(
+                2048,
                 1024,
-                740,
                 "Hello world"
         );
 
@@ -43,8 +50,9 @@ public class Engine implements IEngine {
                 this.keyboardListener
         );
 
-        this.models = new ArrayList<>();
+        this.models = new HashMap<>();
         this.lights = new ArrayList<>();
+        this.terrains = new ArrayList<>();
     }
 
     public void start() {
@@ -65,26 +73,36 @@ public class Engine implements IEngine {
     private void init() {
         this.keyboardListener.bindWindow(this.window);
 
-        final var program = new ProgramShader();
-        program.attachShader(Shader.loadShader(
-                Shader.Type.VERTEX,
-                "src/main/resources/shaders/default.vert"
-        ));
-
-        program.attachShader(Shader.loadShader(
-                Shader.Type.FRAGMENT,
+        final var entityShader = this.createEntityShader(
+                "src/main/resources/shaders/default.vert",
                 "src/main/resources/shaders/default.frag"
-        ));
+        );
 
-        this.renderer.attachProgramShader(program);
+        final var terrainShader = this.createTerrainShader(
+                "src/main/resources/shaders/terrain.vert",
+                "src/main/resources/shaders/terrain.frag"
+        );
+
+        this.renderer.attachProgramShader(entityShader);
+        this.renderer.attachProgramShader(terrainShader);
+
         this.renderer.init();
 
-//        this.models.add(Square.create(
-//                Point.create(-0.5f, 0.5f),
-//                Point.create(-0.5f, -0.5f),
-//                Point.create(0.5f, -0.5f),
-//                Point.create(0.5f, 0.5f)
-//        )
+//        this.addModelToRender(
+//                textureTest,
+//                Square.create(
+//                        Point.create(-0.5f, 0.5f),
+//                        Point.create(-0.5f, -0.5f),
+//                        Point.create(0.5f, -0.5f),
+//                        Point.create(0.5f, 0.5f)
+//                ).addTexture(textureTest, new float[] {
+//                         0,0, //VO,
+//                         0,1, //V1
+//                         1,1, //V2
+//                         1,0
+//               })
+//        );
+
 ////         .changeColor(1, 255, 255, 255)
 ////         .translate(0.5f, 0.5f, 0.f)
 //         .translate(-0.1f, 0.0f, -1f)
@@ -100,22 +118,92 @@ public class Engine implements IEngine {
 //         )
 //        );
 
-        final var model = GraphicModel.loadFromObj(
-                Path.of("src/main/resources/models/stall.obj"),
-                Texture.loadTexture("src/main/resources/textures/stall-texture.png"),
-                10,
-                0
+        this.renderer.getTerrainShader().use();
+
+        final var whiteTexture = Texture.loadTexture("src/main/resources/textures/white-texture.png");
+//        final var entity = GraphicModel.loadFromObj(
+//                Path.of("src/main/resources/models/dragon.obj"),
+//                entityTexture,
+//                10,
+//                0
+//        ).setPosition(new Vector3f(20, 0, 20));
+//
+//        this.addModelToRender(
+//                entityTexture,
+//                entity
+//        );
+
+//        this.modelTest = entity;
+
+        final var treeTexture = Texture.loadTexture("src/main/resources/textures/tree.png");
+        final var tallGrassTexture = Texture.loadTexture(
+                "src/main/resources/textures/tall-grass.png",
+                true,
+                true
         );
 
+        final var treeModel = OBJLoader.loadOBJ(Path.of("src/main/resources/models/tree.obj"));
+        final var tallGrassModel = OBJLoader.loadOBJ(Path.of("src/main/resources/models/tall-grass.obj"));
+        final var random = new Random();
+
+        for (var i = 0; i < 100; i++) {
+            final var treeEntity = GraphicModel.create(
+                    treeModel,
+                    treeTexture
+            ).setPosition(new Vector3f(random.nextFloat()*128 - 64, 0, random.nextFloat() * -100));
+
+            this.addModelToRender(
+                    treeTexture,
+                    treeEntity
+            );
+
+            final var tallGrassEntity = GraphicModel.create(
+                    tallGrassModel,
+                    tallGrassTexture
+            )
+            .setPosition(new Vector3f(random.nextFloat()*128 - 64, 0, random.nextFloat() * -100))
+            .changeScale(.5f);
+
+            this.addModelToRender(
+                    tallGrassTexture,
+                    tallGrassEntity
+            );
+        }
+
         final var light = Light.create(
-                new Vector3f(0, 0, -20f),
+                new Vector3f(20000, 20000, 20000),
                 ColorEnum.WHITE.getValue()
         );
 
-        model.increasePosition(0, 0, -30f);
-        model.increaseRotation(0, 30f, 0);
-        this.models.add(model);
+        final var terrainGrassTexture = Texture.loadTexture("src/main/resources/textures/grass.png");
+        final var terrain = Terrain.create(
+                0,
+                -1,
+                128,
+                terrainGrassTexture
+        );
+
+        final var terrain2 = Terrain.create(
+                -1,
+                -1,
+                128,
+                terrainGrassTexture
+        );
+
+        final var lightTerrain = Light.create(
+                new Vector3f(-1, -1, 10f),
+                ColorEnum.WHITE.getValue()
+        );
+
+//        model.increasePosition(0, 0, -30f);
+//        model.increaseRotation(0, 30f, 0);
+//        terrain.increasePosition(-20, -1, -25f);
+//        terrain2.increasePosition(0, 0, -30f);
+
+        this.terrains.add(terrain);
+        this.terrains.add(terrain2);
         this.lights.add(light);
+//        this.lights.add(lightTerrain);
 
 
 //        this.models.add(Triangle.create(
@@ -135,8 +223,62 @@ public class Engine implements IEngine {
         this.isRunning = true;
     }
 
+    private void addModelToRender(
+            final Texture texture,
+            final GraphicModel graphicModel
+    ) {
+        if(!this.models.containsKey(texture)) {
+            this.models.put(texture, new ArrayList<>());
+        }
+
+        this.models.get(texture).add(graphicModel);
+    }
+
+    private EntityShader createEntityShader(
+            final String vertexShader,
+            final String fragmentShader
+    ) {
+        final var program = new EntityShader();
+        this.attachShader(
+                program,
+                vertexShader,
+                fragmentShader
+        );
+        return program;
+    }
+
+    private TerrainShader createTerrainShader(
+            final String vertexShader,
+            final String fragmentShader
+    ) {
+        final var program = new TerrainShader();
+        this.attachShader(
+                program,
+                vertexShader,
+                fragmentShader
+        );
+        return program;
+    }
+
+    private ProgramShader attachShader(
+            final ProgramShader shader,
+            final String vertexShader,
+            final String fragmentShader
+    ) {
+        shader.attachShader(Shader.loadShader(
+                Shader.Type.VERTEX,
+                vertexShader
+        ));
+
+        shader.attachShader(Shader.loadShader(
+                Shader.Type.FRAGMENT,
+                fragmentShader
+        ));
+        return shader;
+    }
+
     private void loop() {
-        GL33.glClearColor(0f, 0f, 0f, 1f);
+        GL33.glClearColor(0f, 0f, 1f, 1f);
         while(this.isRunning) {
 
             if(this.window.shouldClose()) {
@@ -146,9 +288,16 @@ public class Engine implements IEngine {
             GL33.glEnable(GL33.GL_DEPTH_TEST);
             GL33.glClear(GL33.GL_COLOR_BUFFER_BIT|GL33.GL_DEPTH_BUFFER_BIT);
 
-            this.renderer.render(
+            this.renderer.prepareRenderEntity();
+            this.renderer.renderEntity(
                 this.models,
                 this.lights
+            );
+
+            this.renderer.prepareRenderTerrain();
+            this.renderer.renderTerrain(
+                    this.terrains,
+                    this.lights
             );
 
             this.window.update();

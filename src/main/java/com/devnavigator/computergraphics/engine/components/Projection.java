@@ -1,14 +1,15 @@
 package com.devnavigator.computergraphics.engine.components;
 
-import com.devnavigator.computergraphics.engine.components.math.Matrix4f;
 import com.devnavigator.computergraphics.engine.components.renderer.ProgramShader;
+import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL33;
 
 public class Projection {
 
-    private static final float FOV = 70;
+    private static final float FOV = (float) Math.toRadians(45f);
     private static final float NEAR_PLANE = 0.1f;
 
-    private static final float FAR_PLANE = 1000;
+    private static final float FAR_PLANE = 100.0f;
 
     private Matrix4f projectionMatrix;
 
@@ -16,7 +17,7 @@ public class Projection {
     public Projection(
         final float aspectRation
     ) {
-        this.projectionMatrix = Matrix4f.perspective(
+        this.projectionMatrix = new Matrix4f().setPerspective(
                 FOV,
                 aspectRation,
                 NEAR_PLANE,
@@ -32,11 +33,9 @@ public class Projection {
         return new Projection(aspectRation);
     }
 
-    public void init(final ProgramShader programShader) {
-        final var location = programShader.getUniformLocation("projectionMatrix");
-        programShader.updateUniformValue(
-                location,
-                this.projectionMatrix
-        );
+    public void update(final ProgramShader programShader) {
+        programShader.use();
+        programShader.updateProjection(this.projectionMatrix);
+        GL33.glUseProgram(0);
     }
 }

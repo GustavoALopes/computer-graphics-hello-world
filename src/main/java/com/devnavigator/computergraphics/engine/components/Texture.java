@@ -5,6 +5,7 @@ import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 public class Texture {
 
@@ -22,14 +23,37 @@ public class Texture {
      */
     private int height;
 
+    private final boolean hasTransparency;
+
+    private final boolean useFakeLight;
+
     /** Creates a texture. */
     public Texture() {
         id = GL33.glGenTextures();
+        this.hasTransparency = false;
+        this.useFakeLight = false;
+    }
+
+    public Texture(
+            final boolean hasTransparency,
+            final boolean useFakeLight
+    ) {
+        id = GL33.glGenTextures();
+        this.hasTransparency = hasTransparency;
+        this.useFakeLight = useFakeLight;
     }
 
 
     public int getId() {
         return this.id;
+    }
+
+    public boolean isHasTransparency() {
+        return this.hasTransparency;
+    }
+
+    public boolean isUseFakeLight() {
+        return useFakeLight;
     }
 
     /**
@@ -121,6 +145,19 @@ public class Texture {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Texture texture = (Texture) o;
+        return id == texture.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
     /**
      * Creates a texture with specified width, height and data.
      *
@@ -130,8 +167,17 @@ public class Texture {
      *
      * @return com.devjourney.Texture from the specified data
      */
-    public static Texture createTexture(int width, int height, ByteBuffer data) {
-        Texture texture = new Texture();
+    public static Texture createTexture(
+            final int width,
+            final int height,
+            final ByteBuffer data,
+            final boolean hasTransparency,
+            final boolean useFakeLight
+    ) {
+        Texture texture = new Texture(
+                hasTransparency,
+                useFakeLight
+        );
         texture.setWidth(width);
         texture.setHeight(height);
 
@@ -143,8 +189,8 @@ public class Texture {
          * S: Horizontal
          * T: Vertical
         */
-        texture.setParameter(GL33.GL_TEXTURE_WRAP_S, GL33.GL_CLAMP_TO_BORDER);
-        texture.setParameter(GL33.GL_TEXTURE_WRAP_T, GL33.GL_CLAMP_TO_BORDER);
+        texture.setParameter(GL33.GL_TEXTURE_WRAP_S, GL33.GL_REPEAT);
+        texture.setParameter(GL33.GL_TEXTURE_WRAP_T, GL33.GL_REPEAT);
         /**
          * GL_TEXTURE_MIN_FILTER: Configure the filter when the texture is viewed at smaller size(minification)
          * GL_TEXTURE_MAG_FILTER: The same above buts for large size(magnification)
@@ -157,6 +203,16 @@ public class Texture {
         return texture;
     }
 
+    public static Texture loadTexture(
+            final String path
+    ) {
+        return loadTexture(
+            path,
+            false,
+                false
+        );
+    }
+
     /**
      * Load texture from file.
      *
@@ -164,7 +220,11 @@ public class Texture {
      *
      * @return com.devjourney.Texture from specified file
      */
-    public static Texture loadTexture(final String path) {
+    public static Texture loadTexture(
+            final String path,
+            final boolean hasTransparency,
+            final boolean useFakeLight
+    ) {
         ByteBuffer image;
         int width, height;
         try (final var stack = MemoryStack.stackPush()) {
@@ -192,7 +252,7 @@ public class Texture {
             height = h.get();
         }
 
-        return createTexture(width, height, image);
+        return createTexture(width, height, image, hasTransparency, useFakeLight);
     }
 
 }

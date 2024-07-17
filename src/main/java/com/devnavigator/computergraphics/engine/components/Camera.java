@@ -1,15 +1,14 @@
 package com.devnavigator.computergraphics.engine.components;
 
-import com.devnavigator.computergraphics.engine.components.math.Matrix4f;
-import com.devnavigator.computergraphics.engine.components.math.Vector3f;
 import com.devnavigator.computergraphics.engine.components.renderer.ProgramShader;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 public class Camera {
 
     private final KeyboardListener keyboard;
 
     private Vector3f position;
-
 
     private float pitch;
 
@@ -19,7 +18,7 @@ public class Camera {
 
 
     public Camera(final KeyboardListener keyboardListener) {
-        this.position = new Vector3f();
+        this.position = new Vector3f(0, 1f, 0);
         this.keyboard = keyboardListener;
     }
 
@@ -57,35 +56,37 @@ public class Camera {
         }
 
         if(this.keyboard.isKeyDown(KeyboardListener.Key.W)) {
-            this.position.y += 0.1f;
+            this.position.y += 0.05f;
         }
 
         if(this.keyboard.isKeyDown(KeyboardListener.Key.S)) {
-            this.position.y -= 0.1f;
+            this.position.y -= 0.05f;
         }
 
-        final var viewMatrix = createViewMatrix();
+        final var viewMatrix = this.createViewMatrix();
 
-        final var location = programShader.getUniformLocation("viewMatrix");
-        programShader.updateUniformValue(
-                location,
-                viewMatrix
-        );
+        programShader.updateView(viewMatrix);
     }
 
     private Matrix4f createViewMatrix() {
-        var viewMatrix = new Matrix4f();
-        viewMatrix.setIdentity();
 
-        viewMatrix = viewMatrix.rotate((float) Math.toRadians(this.pitch), 1, 0, 0);
-        viewMatrix = viewMatrix.rotate((float) Math.toRadians(this.yaw), 0, 1, 0);
+        return new Matrix4f()
+                            .rotate((float) Math.toRadians(this.pitch), 1, 0, 0)
+                            .rotate((float) Math.toRadians(this.yaw), 0, 1, 0)
+                            .translate(-this.position.x, -this.position.y, -this.position.z);
 
 
-        final var negativeCameraPosition = new Vector3f(-this.position.x, -this.position.y, -this.position.z);
-        return viewMatrix.multiply(Matrix4f.translate(
-                negativeCameraPosition.x,
-                negativeCameraPosition.y,
-                negativeCameraPosition.z
-        ));
+//        final var negativeCameraPosition = new Vector3f(-this.position.x, -this.position.y, -this.position.z);
+//        return viewMatrix.multiply(Matrix4f.translate(
+//                negativeCameraPosition.x,
+//                negativeCameraPosition.y,
+//                negativeCameraPosition.z
+//        ));
+//        return new Matrix4f()
+//                .lookAt(
+//                        this.position,
+//                        new Vector3f(0f, 0f, 0f), //look to origin
+//                        new Vector3f(0f, 1f, 0f)
+//                );
     }
 }
