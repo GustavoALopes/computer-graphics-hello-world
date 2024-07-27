@@ -11,53 +11,56 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class ResourceManager {
+public final class ResourceManager {
 
-    private final Map<String, TexturedModel> resources;
+    private static final Map<String, TexturedModel> resources = new HashMap<>();
 
-    private final Map<String, NewRawModel> models;
+    private static final Map<String, NewRawModel> models = new HashMap<>();
 
-    private final Map<String, Texture> textures;
+    private static final Map<String, Texture> textures = new HashMap<>();
 
-    private ResourceManager() {
-        this.resources = new HashMap<>();
-        this.models = new HashMap<>();
-        this.textures = new HashMap<>();
-    }
+//    private ResourceManager() {
+//        this.resources = new HashMap<>();
+//        this.models = new HashMap<>();
+//        this.textures = new HashMap<>();
+//    }
 
     public static ResourceManager create() {
         return new ResourceManager();
     }
 
-    public TexturedModel getResource(final String resourceName) {
-        return this.resources.get(resourceName);
+    public static NewRawModel getRawModel(
+            final Path objPath,
+            final ProgramShader.Types shaderType
+    ) {
+        return getOrCreateRawModel(objPath, shaderType);
     }
 
-    public TexturedModel getOrCreate(
+    public TexturedModel getResource(final String resourceName) {
+        return resources.get(resourceName);
+    }
+
+    public static TexturedModel getOrCreate(
             final Path objPath,
             final Path texturePath,
             final ProgramShader.Types shardeType
     ) {
-        final var model = this.resources.get(String.join(
-                ":",
-                        objPath.getFileName().toString(),
-                        texturePath.getFileName().toString()
+        final var model = resources.get(String.join(
+            ":",
+            objPath.getFileName().toString(),
+            texturePath.getFileName().toString()
         ));
 
         if(Objects.nonNull(model)) {
             return model;
         }
 
-        var rawModel = this.models.get(objPath.getFileName().toString());
-        if(Objects.isNull(rawModel)) {
-            rawModel = this.createRawModel(objPath, shardeType);
-            this.models.put(objPath.getFileName().toString(), rawModel);
-        }
+        var rawModel = getOrCreateRawModel(objPath, shardeType);
 
-        var texture = this.textures.get(texturePath.getFileName().toString());
+        var texture = textures.get(texturePath.getFileName().toString());
         if(Objects.isNull(texture)) {
             texture = Texture.loadTexture(texturePath.toString());
-            this.textures.put(texturePath.getFileName().toString(), texture);
+            textures.put(texturePath.getFileName().toString(), texture);
         }
 
         final var textureModel = TexturedModel.create(
@@ -65,7 +68,7 @@ public class ResourceManager {
                 texture
         );
 
-        this.resources.put(String.join(
+        resources.put(String.join(
                 ":",
                 objPath.getFileName().toString(),
                 texturePath.getFileName().toString()
@@ -87,18 +90,26 @@ public class ResourceManager {
 //        );
 //    }
 
-    private NewRawModel createRawModel(
+    private static NewRawModel getOrCreateRawModel(
             final Path objPath,
             final ProgramShader.Types shaderType
     ) {
+        var rawModel = models.get(objPath.getFileName().toString());
+        if(Objects.nonNull(rawModel)) {
+            return rawModel;
+        }
+
         final var props = OBJLoader.loadOBJ(objPath);
-        return createRawModel(
+        rawModel = createRawModel(
                 props.getValue0(),
                 props.getValue1(),
                 props.getValue2(),
                 props.getValue3(),
                 shaderType
         );
+
+        models.put(objPath.getFileName().toString(), rawModel);
+        return rawModel;
 
 //        final var vao = new VertexArrayObject();
 //        vao.bind();
@@ -243,15 +254,15 @@ public class ResourceManager {
         return Objects.equals(ProgramShader.Types.ENTITY, shaderType) ? EntityShader.POSITION_LAYER : TerrainShader.POSITION_LAYER;
     }
 
-    public Texture getTexture(final Path pathTexture) {
-        var texture = this.textures.get(pathTexture.getFileName().toString());
+    public static Texture getTexture(final Path pathTexture) {
+        var texture = textures.get(pathTexture.getFileName().toString());
         if(Objects.nonNull(texture)) {
             return texture;
         }
 
         texture = Texture.loadTexture(pathTexture.toString());
 
-        this.textures.put(
+        textures.put(
                 pathTexture.getFileName().toString(),
                 texture
         );

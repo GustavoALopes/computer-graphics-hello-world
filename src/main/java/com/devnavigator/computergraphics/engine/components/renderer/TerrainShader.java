@@ -83,7 +83,7 @@ public class TerrainShader extends ProgramShader {
 
     @Override
     protected int getUseFakeLightingLocation() {
-        return 0;
+        return -1;
     }
 
     @Override

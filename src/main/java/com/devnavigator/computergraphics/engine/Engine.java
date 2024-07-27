@@ -1,12 +1,11 @@
 package com.devnavigator.computergraphics.engine;
 
 import com.devnavigator.computergraphics.components.Light;
-import com.devnavigator.computergraphics.components.Point;
-import com.devnavigator.computergraphics.components.Square;
 import com.devnavigator.computergraphics.components.Terrain;
 import com.devnavigator.computergraphics.components.base.GraphicModel;
 import com.devnavigator.computergraphics.components.base.NewGraphicModel;
 import com.devnavigator.computergraphics.components.base.ResourceManager;
+import com.devnavigator.computergraphics.components.base.TexturedModel;
 import com.devnavigator.computergraphics.engine.components.*;
 import com.devnavigator.computergraphics.engine.components.colors.ColorEnum;
 import com.devnavigator.computergraphics.engine.components.renderer.EntityShader;
@@ -30,8 +29,6 @@ public class Engine implements IEngine {
 
     private GraphicModel modelTest;
 
-    private final ResourceManager resourceManager;
-
     private Map<Texture, List<NewGraphicModel>> models;
 
     private List<Light> lights;
@@ -41,7 +38,6 @@ public class Engine implements IEngine {
     private boolean isRunning;
 
     public Engine() {
-        this.resourceManager = ResourceManager.create();
         this.keyboardListener = new KeyboardListener();
         this.window = new Window(
                 2048,
@@ -139,19 +135,27 @@ public class Engine implements IEngine {
 //                entity
 //        );
 
-//        this.modelTest = entity;
 
-        final var treeModel = this.resourceManager.getOrCreate(
+        final var treeModel = ResourceManager.getOrCreate(
                 Path.of("src/main/resources/models/tree.obj"),
                 Path.of("src/main/resources/textures/tree.png"),
                 ProgramShader.Types.ENTITY
         );
 
-
-        final var tallGrassModel = this.resourceManager.getOrCreate(
+        final var tallGrassRawModel = ResourceManager.getRawModel(
                 Path.of("src/main/resources/models/tall-grass.obj"),
-                Path.of("src/main/resources/textures/tall-grass.png"),
                 ProgramShader.Types.ENTITY
+        );
+
+        final var tallGrassTexture = ResourceManager.getTexture(
+                Path.of("src/main/resources/textures/tall-grass.png")
+        );
+        tallGrassTexture.enableTransparency();
+        tallGrassTexture.enableFakeLight();
+
+        final var tallGrassModel = TexturedModel.create(
+                tallGrassRawModel,
+                tallGrassTexture
         );
 
         final var random = new Random();
@@ -182,7 +186,7 @@ public class Engine implements IEngine {
                 ColorEnum.WHITE.getValue()
         );
 
-        final var terrainGrassTexture = this.resourceManager.getTexture(
+        final var terrainGrassTexture = ResourceManager.getTexture(
             Path.of("src/main/resources/textures/grass.png")
         );
 
