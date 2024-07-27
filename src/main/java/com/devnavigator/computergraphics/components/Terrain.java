@@ -1,45 +1,62 @@
 package com.devnavigator.computergraphics.components;
 
-import com.devnavigator.computergraphics.components.base.GraphicModel;
-import com.devnavigator.computergraphics.components.base.RawModel;
+import com.devnavigator.computergraphics.components.base.*;
 import com.devnavigator.computergraphics.engine.components.Texture;
+import com.devnavigator.computergraphics.engine.components.renderer.ProgramShader;
 import org.javatuples.Quartet;
 import org.joml.Vector3f;
 
-public class Terrain extends GraphicModel {
+import java.util.ArrayList;
+import java.util.List;
+
+public class Terrain extends NewGraphicModel {
 
     private static final int TERRAIN_SIZE = 240;
 
-    private float x;
+    private List<Texture> textures;
 
-    private float z;
+    private Texture blendMap;
 
     public Terrain(
             final float x,
             final float z,
             final float[] vertices,
-            final float[] textureCoord,
+            final float[] textureCoords,
             final float[] normals,
             final int[] indices,
             final Texture texture
     ) {
         super(
-                RawModel.create(
-                        vertices,
-                        3
-                )
-                .addTexture(1, texture, textureCoord)
-                .addNormals(2, normals)
-                .addIndexBuffer(indices),
-                indices.length,
-                0,
-                0
+                TexturedModel.create(
+                    ResourceManager.createRawModel(
+                      vertices,
+                      textureCoords,
+                      normals,
+                      indices,
+                      ProgramShader.Types.TERRAIN
+                    ),
+                    texture
+                ),
+                new Vector3f(x, 0, z),
+                new Vector3f(0, 0, 0),
+                1
         );
+//        super(
+//                RawModel.create(
+//                        vertices,
+//                        3
+//                )
+//                .addTexture(1, texture, textureCoord)
+//                .addNormals(2, normals)
+//                .addIndexBuffer(indices),
+//                indices.length,
+//                0,
+//                0
+//        );
 
-        this.setPosition(new Vector3f(x, 0, z));
+        this.textures = new ArrayList<>();
 
-        this.x = x;
-        this.z = z;
+//        this.setPosition(new Vector3f(x, 0, z));
     }
 
     public static Terrain create(
@@ -55,7 +72,7 @@ public class Terrain extends GraphicModel {
             final Texture texture
     ) {
         final var terrainInfo = generateTerrain(size);
-        final var terrain = new Terrain(
+        return new Terrain(
                 x * size,
                 z * size,
                 terrainInfo.getValue0(),
@@ -64,7 +81,6 @@ public class Terrain extends GraphicModel {
                 terrainInfo.getValue3(),
                 texture
         );
-        return terrain;
     }
 
     private static Quartet<float[], float[], float[], int[]> generateTerrain(

@@ -23,6 +23,7 @@ public class RawModel {
 
     private RawModel() {
         this.vao = new VertexArrayObject();
+        this.vao.bind();
         this.vbos = new HashMap<>();
     }
 
@@ -43,7 +44,7 @@ public class RawModel {
             final float[] position,
             final int coordSize
     ) {
-        this.vao.bind();
+//        this.vao.bind();
 
         final var vbo = this.getOrCreateVBO("vertices");
         vbo.bind();
@@ -76,13 +77,10 @@ public class RawModel {
             final Texture texture,
             final float[] coordinates
     ) {
-        this.vao.bind();
+//        this.vao.bind();
 
         final var textureAttrib = this.getOrCreateVBO("textureCoordinates");
         textureAttrib.bind();
-
-//        final var FloatBuffer = new FloatBuffer();
-
 
         textureAttrib.updateData(coordinates);
 
@@ -115,7 +113,7 @@ public class RawModel {
             final int shaderNormalAttrPosition,
             final float[] normals
     ) {
-        this.vao.bind();
+//        this.vao.bind();
 
         final var normalsAttr = this.getOrCreateVBO("normals");
         normalsAttr.bind();
@@ -140,7 +138,7 @@ public class RawModel {
             final int shaderIndexAttrib,
             final int[] color
     ) {
-        this.vao.bind();
+//        this.vao.bind();
 
         final var vbo = this.getOrCreateVBO("color");
         vbo.bind();

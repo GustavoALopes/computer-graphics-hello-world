@@ -3,6 +3,7 @@ package com.devnavigator.computergraphics.engine.components;
 import com.devnavigator.computergraphics.components.Light;
 import com.devnavigator.computergraphics.components.Terrain;
 import com.devnavigator.computergraphics.components.base.GraphicModel;
+import com.devnavigator.computergraphics.components.base.NewGraphicModel;
 import com.devnavigator.computergraphics.engine.components.renderer.EntityShader;
 import com.devnavigator.computergraphics.engine.components.renderer.ProgramShader;
 import com.devnavigator.computergraphics.engine.components.renderer.TerrainShader;
@@ -75,7 +76,8 @@ public class Renderer {
     }
 
     public void renderEntity(
-            final Map<Texture, List<GraphicModel>> models,
+//            final Map<Texture, List<GraphicModel>> models,
+            final Map<Texture, List<NewGraphicModel>> models,
             final Collection<Light> lights
     ) {
         final var light = lights.stream().findFirst().orElse(null);
@@ -99,11 +101,12 @@ public class Renderer {
     }
 
     public void render(
-        final GraphicModel model,
+//        final GraphicModel model,
+        final NewGraphicModel model,
         final Light light,
         final ProgramShader shader
     ) {
-        GL33.glBindVertexArray(model.getModel().getVaoId());
+        GL33.glBindVertexArray(model.getModel().getRawModel().getVao().getId());
 
 //        model.increasePosition(0f, 0f, -0.01f);
 //        model.increaseRotation(0f, 10f, 0);
@@ -116,8 +119,8 @@ public class Renderer {
         shader.updateTransformation(model.getTransformationMatrix());
         shader.updateLight(light);
         shader.updateUseFakeLighting(model.getModel().getTexture().isUseFakeLight());
-        shader.updateShineDamper(model.getShineDamper());
-        shader.updateReflectivity(model.getReflectivity());
+        shader.updateShineDamper(0);//model.getShineDamper());
+        shader.updateReflectivity(0);//model.getReflectivity());
 
 
 //        final var lightPosition = shader.getUniformLocation("lightPosition");
@@ -146,7 +149,7 @@ public class Renderer {
 //                model.getReflectivity()
 //        );
 
-        this.flush(model.getNumVertex());
+        this.flush(model.getModel().getRawModel().getNumbersOfVertex());
     }
 
     public void flush(final int numVertex) {

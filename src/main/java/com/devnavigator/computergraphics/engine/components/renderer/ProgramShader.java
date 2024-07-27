@@ -146,4 +146,9 @@ public abstract class ProgramShader {
     protected abstract int getUseFakeLightingLocation();
 
     public abstract void updateUseFakeLighting(final boolean useFakeLight);
+
+    public enum Types {
+        ENTITY,
+        TERRAIN
+    }
 }
