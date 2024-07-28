@@ -15,7 +15,7 @@ out vec3 toLightVectorOut;
 out vec3 toCameraVectorOut;
 
 void main() {
-        textCoordsOut = textCoordsIn * 40.0;
+        textCoordsOut = textCoordsIn;
 
         vec4 worldPosition = transformationMatrix * vec4(position, 1.0f);
         gl_Position = projectionMatrix * viewMatrix * worldPosition;

@@ -4,19 +4,19 @@ import com.devnavigator.computergraphics.engine.components.Texture;
 
 public class TexturedModel {
 
-    private final NewRawModel rawModel;
+    private final RawModel rawModel;
 
     private final Texture texture;
 
     private TexturedModel(
-            final NewRawModel rawModel,
+            final RawModel rawModel,
             final Texture texture
     ) {
         this.rawModel = rawModel;
         this.texture = texture;
     }
 
-    public NewRawModel getRawModel() {
+    public RawModel getRawModel() {
         return this.rawModel;
     }
 
@@ -25,7 +25,7 @@ public class TexturedModel {
     }
 
     public static TexturedModel create(
-            final NewRawModel rawModel,
+            final RawModel rawModel,
             final Texture texture
     ) {
         return new TexturedModel(

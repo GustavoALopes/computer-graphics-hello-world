@@ -76,17 +76,24 @@ public abstract class ProgramShader {
         }
     }
 
-    public void updateUniformValue(final int location, final float value) {
+    protected void updateUniformValue(
+            final int location,
+            final int value
+    ) {
+        GL33.glUniform1i(location, value);
+    }
+
+    protected void updateUniformValue(final int location, final float value) {
         GL33.glUniform1f(location, value);
     }
 
-    public void updateUniformValue(final int location, final boolean value) {
+    protected void updateUniformValue(final int location, final boolean value) {
         final float finalValue = value ? 1 : 0;
         GL33.glUniform1f(location, finalValue);
     }
 
 
-    public void updateUniformValue(final int location, final Vector3f vector) {
+    protected void updateUniformValue(final int location, final Vector3f vector) {
         GL33.glUniform3f(location, vector.x, vector.y, vector.z);
     }
 

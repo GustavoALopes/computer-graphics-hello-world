@@ -1,21 +1,28 @@
 package com.devnavigator.computergraphics.components;
 
-import com.devnavigator.computergraphics.components.base.*;
+import com.devnavigator.computergraphics.components.base.RawModel;
+import com.devnavigator.computergraphics.components.base.ResourceManager;
 import com.devnavigator.computergraphics.engine.components.Texture;
 import com.devnavigator.computergraphics.engine.components.renderer.ProgramShader;
 import org.javatuples.Quartet;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class Terrain extends NewGraphicModel {
+public class Terrain {
 
     private static final int TERRAIN_SIZE = 240;
 
-    private List<Texture> textures;
+    public static final int SCALE = 1;
 
-    private Texture blendMap;
+    private static Matrix4f transformationMatrix;
+
+    private final RawModel rawModel;
+
+    private final Vector3f position;
+
+    private TexturesPack texturesPack;
+
+    private final Texture blendMap;
 
     public Terrain(
             final float x,
@@ -24,52 +31,51 @@ public class Terrain extends NewGraphicModel {
             final float[] textureCoords,
             final float[] normals,
             final int[] indices,
-            final Texture texture
+            final Texture blendMap,
+            final TexturesPack texturesPack
     ) {
-        super(
-                TexturedModel.create(
-                    ResourceManager.createRawModel(
-                      vertices,
-                      textureCoords,
-                      normals,
-                      indices,
-                      ProgramShader.Types.TERRAIN
-                    ),
-                    texture
-                ),
-                new Vector3f(x, 0, z),
-                new Vector3f(0, 0, 0),
-                1
+        this.rawModel = ResourceManager.createRawModel(
+                vertices,
+                textureCoords,
+                normals,
+                indices,
+                ProgramShader.Types.TERRAIN
         );
-//        super(
-//                RawModel.create(
-//                        vertices,
-//                        3
-//                )
-//                .addTexture(1, texture, textureCoord)
-//                .addNormals(2, normals)
-//                .addIndexBuffer(indices),
-//                indices.length,
-//                0,
-//                0
-//        );
 
-        this.textures = new ArrayList<>();
+        this.position = new Vector3f(x, 0, z);
 
-//        this.setPosition(new Vector3f(x, 0, z));
+        this.blendMap = blendMap;
+        this.texturesPack = texturesPack;
+    }
+
+    public TexturesPack getTexturesPack() {
+        return texturesPack;
+    }
+
+    public Texture getBlendMap() {
+        return blendMap;
+    }
+
+    public RawModel getRawModel() {
+        return rawModel;
+    }
+
+    public Vector3f getPosition() {
+        return position;
     }
 
     public static Terrain create(
             final float size
     ) {
-        return create(0, 0, size, null);
+        return create(0, 0, size, null, null);
     }
 
     public static Terrain create(
             final float x,
             final float z,
             final float size,
-            final Texture texture
+            final Texture blendMap,
+            final TexturesPack texturesPack
     ) {
         final var terrainInfo = generateTerrain(size);
         return new Terrain(
@@ -79,7 +85,8 @@ public class Terrain extends NewGraphicModel {
                 terrainInfo.getValue1(),
                 terrainInfo.getValue2(),
                 terrainInfo.getValue3(),
-                texture
+                blendMap,
+                texturesPack
         );
     }
 
@@ -132,5 +139,66 @@ public class Terrain extends NewGraphicModel {
                 normals,
                 indices
         );
+    }
+
+    public Matrix4f getTransformationMatrix() {
+       final var matrix = new Matrix4f();
+
+        matrix.translate(this.position);
+
+        return matrix;
+    }
+
+    public static class TexturesPack {
+
+        private final Texture backgroudTexture;
+
+        private final Texture rTexture;
+
+        private final Texture gTexture;
+
+        private final Texture bTexture;
+
+        public TexturesPack(
+                final Texture backgroudTexture,
+                final Texture rTexture,
+                final Texture gTexture,
+                final Texture bTexture
+        ) {
+            this.backgroudTexture = backgroudTexture;
+            this.rTexture = rTexture;
+            this.gTexture = gTexture;
+            this.bTexture = bTexture;
+        }
+
+        public Texture getBackgroudTexture() {
+            return backgroudTexture;
+        }
+
+        public Texture getrTexture() {
+            return rTexture;
+        }
+
+        public Texture getgTexture() {
+            return gTexture;
+        }
+
+        public Texture getbTexture() {
+            return bTexture;
+        }
+
+        public static TexturesPack create(
+            final Texture backgroudTexture,
+            final Texture rTexture,
+            final Texture gTexture,
+            final Texture bTexture
+        ) {
+            return new TexturesPack(
+                    backgroudTexture,
+                    rTexture,
+                    gTexture,
+                    bTexture
+            );
+        }
     }
 }

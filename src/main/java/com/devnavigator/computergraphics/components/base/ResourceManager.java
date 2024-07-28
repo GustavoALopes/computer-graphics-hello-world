@@ -15,21 +15,16 @@ public final class ResourceManager {
 
     private static final Map<String, TexturedModel> resources = new HashMap<>();
 
-    private static final Map<String, NewRawModel> models = new HashMap<>();
+    private static final Map<String, RawModel> models = new HashMap<>();
 
     private static final Map<String, Texture> textures = new HashMap<>();
 
-//    private ResourceManager() {
-//        this.resources = new HashMap<>();
-//        this.models = new HashMap<>();
-//        this.textures = new HashMap<>();
-//    }
 
     public static ResourceManager create() {
         return new ResourceManager();
     }
 
-    public static NewRawModel getRawModel(
+    public static RawModel getRawModel(
             final Path objPath,
             final ProgramShader.Types shaderType
     ) {
@@ -90,7 +85,7 @@ public final class ResourceManager {
 //        );
 //    }
 
-    private static NewRawModel getOrCreateRawModel(
+    private static RawModel getOrCreateRawModel(
             final Path objPath,
             final ProgramShader.Types shaderType
     ) {
@@ -132,7 +127,7 @@ public final class ResourceManager {
 //        );
     }
 
-    public static NewRawModel createRawModel(
+    public static RawModel createRawModel(
             final float[] position,
             final float[] textureCoords,
             final float[] normals,
@@ -148,7 +143,7 @@ public final class ResourceManager {
         final var index = setIndexes(indexes);
         final var numberOfVertex = indexes.length;
 
-        return NewRawModel.create(
+        return RawModel.create(
                 vao,
                 Map.of(
                         "position", vboPosition,

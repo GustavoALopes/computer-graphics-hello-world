@@ -3,7 +3,6 @@ package com.devnavigator.computergraphics.engine;
 import com.devnavigator.computergraphics.components.Light;
 import com.devnavigator.computergraphics.components.Terrain;
 import com.devnavigator.computergraphics.components.base.GraphicModel;
-import com.devnavigator.computergraphics.components.base.NewGraphicModel;
 import com.devnavigator.computergraphics.components.base.ResourceManager;
 import com.devnavigator.computergraphics.components.base.TexturedModel;
 import com.devnavigator.computergraphics.engine.components.*;
@@ -27,9 +26,7 @@ public class Engine implements IEngine {
 
     private final Renderer renderer;
 
-    private GraphicModel modelTest;
-
-    private Map<Texture, List<NewGraphicModel>> models;
+    private Map<Texture, List<GraphicModel>> models;
 
     private List<Light> lights;
 
@@ -161,7 +158,7 @@ public class Engine implements IEngine {
         final var random = new Random();
 
         for (var i = 0; i < 100; i++) {
-            final var treeEntity = NewGraphicModel.create(treeModel)
+            final var treeEntity = GraphicModel.create(treeModel)
                 .setPosition(new Vector3f(random.nextFloat()*128 - 64, 0, random.nextFloat() * -100))
                 .build();
 
@@ -170,7 +167,7 @@ public class Engine implements IEngine {
                     treeEntity
             );
 
-            final var tallGrassEntity = NewGraphicModel.create(tallGrassModel)
+            final var tallGrassEntity = GraphicModel.create(tallGrassModel)
                     .setPosition(new Vector3f(random.nextFloat()*128 - 64, 0, random.nextFloat() * -100))
                     .setScale(.5f)
                     .build();
@@ -186,23 +183,43 @@ public class Engine implements IEngine {
                 ColorEnum.WHITE.getValue()
         );
 
-        final var terrainGrassTexture = ResourceManager.getTexture(
-            Path.of("src/main/resources/textures/grass.png")
+        final var blendMap = ResourceManager.getTexture(
+                Path.of("src/main/resources/textures/blend-map.png")
         );
+//        final var terrainGrassTexture = ResourceManager.getTexture(
+//            Path.of("src/main/resources/textures/grass.png")
+//        );
 
 //        final var terrainGrassTexture = Texture.loadTexture("src/main/resources/textures/grass.png");
+        final var texturePack = Terrain.TexturesPack.create(
+                ResourceManager.getTexture(
+                        Path.of("src/main/resources/textures/grass.png")
+                ),
+                ResourceManager.getTexture(
+                        Path.of("src/main/resources/textures/mud.png")
+                ),
+                ResourceManager.getTexture(
+                        Path.of("src/main/resources/textures/grass-flowers.png")
+                ),
+                ResourceManager.getTexture(
+                        Path.of("src/main/resources/textures/path-rocks.png")
+                )
+        );
+
         final var terrain = Terrain.create(
                 0,
                 -1,
                 128,
-                terrainGrassTexture
+                blendMap,
+                texturePack
         );
 
         final var terrain2 = Terrain.create(
                 -1,
                 -1,
                 128,
-                terrainGrassTexture
+                blendMap,
+                texturePack
         );
 
         final var lightTerrain = Light.create(
@@ -240,7 +257,7 @@ public class Engine implements IEngine {
 
     private void addModelToRender(
             final Texture texture,
-            final NewGraphicModel graphicModel
+            final GraphicModel graphicModel
     ) {
         if(!this.models.containsKey(texture)) {
             this.models.put(texture, new ArrayList<>());

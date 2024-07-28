@@ -13,6 +13,16 @@ public class TerrainShader extends ProgramShader {
     private int viewMatrixLocation;
     private int lightPositionLocation;
 
+    private int blendMapLocation;
+
+    private int backgroundColorLocation;
+
+    private int rTextureLocation;
+
+    private int gTextureLocation;
+
+    private int bTextureLocation;
+
     private int shineDamperLocation;
 
     private int lightColorPositionLocation;
@@ -44,6 +54,21 @@ public class TerrainShader extends ProgramShader {
         this.viewMatrixLocation = super.getUniformLocation("viewMatrix");
         this.lightPositionLocation = super.getUniformLocation("lightPosition");
         this.lightColorPositionLocation = super.getUniformLocation("lightColorPosition");
+
+        this.blendMapLocation = super.getUniformLocation("blendMap");
+        this.backgroundColorLocation = super.getUniformLocation("backgroundColor");
+        this.rTextureLocation = super.getUniformLocation("rTexture");
+        this.gTextureLocation = super.getUniformLocation("gTexture");
+        this.bTextureLocation = super.getUniformLocation("bTexture");
+    }
+
+    public void connectTextures() {
+        this.updateUniformValue(this.blendMapLocation, 4);
+
+        this.updateUniformValue(this.backgroundColorLocation, 0);
+        this.updateUniformValue(this.rTextureLocation, 1);
+        this.updateUniformValue(this.gTextureLocation, 2);
+        this.updateUniformValue(this.bTextureLocation, 3);
     }
 
     @Override

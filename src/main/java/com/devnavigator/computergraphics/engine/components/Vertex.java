@@ -26,17 +26,22 @@
 
 package com.devnavigator.computergraphics.engine.components;
 
-import com.devnavigator.computergraphics.engine.components.math.Vector3f;
+import org.joml.Vector3f;
 
 public class Vertex {
 
     private static final int NO_INDEX = -1;
 
     private Vector3f position;
+
     private int textureIndex = NO_INDEX;
+
     private int normalIndex = NO_INDEX;
+
     private Vertex duplicateVertex = null;
+
     private int index;
+
     private float length;
 
     public Vertex(int index,Vector3f position){
