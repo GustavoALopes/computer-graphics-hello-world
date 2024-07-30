@@ -1,10 +1,10 @@
 package com.devnavigator.computergraphics.engine;
 
 import com.devnavigator.computergraphics.components.Light;
-import com.devnavigator.computergraphics.components.Point;
-import com.devnavigator.computergraphics.components.Square;
 import com.devnavigator.computergraphics.components.Terrain;
 import com.devnavigator.computergraphics.components.base.GraphicModel;
+import com.devnavigator.computergraphics.components.base.ResourceManager;
+import com.devnavigator.computergraphics.components.base.TexturedModel;
 import com.devnavigator.computergraphics.engine.components.*;
 import com.devnavigator.computergraphics.engine.components.colors.ColorEnum;
 import com.devnavigator.computergraphics.engine.components.renderer.EntityShader;
@@ -25,8 +25,6 @@ public class Engine implements IEngine {
     private final KeyboardListener keyboardListener;
 
     private final Renderer renderer;
-
-    private GraphicModel modelTest;
 
     private Map<Texture, List<GraphicModel>> models;
 
@@ -120,7 +118,8 @@ public class Engine implements IEngine {
 
         this.renderer.getTerrainShader().use();
 
-        final var whiteTexture = Texture.loadTexture("src/main/resources/textures/white-texture.png");
+
+//        final var whiteTexture = Texture.loadTexture("src/main/resources/textures/white-texture.png");
 //        final var entity = GraphicModel.loadFromObj(
 //                Path.of("src/main/resources/models/dragon.obj"),
 //                entityTexture,
@@ -133,39 +132,48 @@ public class Engine implements IEngine {
 //                entity
 //        );
 
-//        this.modelTest = entity;
 
-        final var treeTexture = Texture.loadTexture("src/main/resources/textures/tree.png");
-        final var tallGrassTexture = Texture.loadTexture(
-                "src/main/resources/textures/tall-grass.png",
-                true,
-                true
+        final var treeModel = ResourceManager.getOrCreate(
+                Path.of("src/main/resources/models/tree.obj"),
+                Path.of("src/main/resources/textures/tree.png"),
+                ProgramShader.Types.ENTITY
         );
 
-        final var treeModel = OBJLoader.loadOBJ(Path.of("src/main/resources/models/tree.obj"));
-        final var tallGrassModel = OBJLoader.loadOBJ(Path.of("src/main/resources/models/tall-grass.obj"));
+        final var tallGrassRawModel = ResourceManager.getRawModel(
+                Path.of("src/main/resources/models/tall-grass.obj"),
+                ProgramShader.Types.ENTITY
+        );
+
+        final var tallGrassTexture = ResourceManager.getTexture(
+                Path.of("src/main/resources/textures/tall-grass.png")
+        );
+        tallGrassTexture.enableTransparency();
+        tallGrassTexture.enableFakeLight();
+
+        final var tallGrassModel = TexturedModel.create(
+                tallGrassRawModel,
+                tallGrassTexture
+        );
+
         final var random = new Random();
 
         for (var i = 0; i < 100; i++) {
-            final var treeEntity = GraphicModel.create(
-                    treeModel,
-                    treeTexture
-            ).setPosition(new Vector3f(random.nextFloat()*128 - 64, 0, random.nextFloat() * -100));
+            final var treeEntity = GraphicModel.create(treeModel)
+                .setPosition(new Vector3f(random.nextFloat()*128 - 64, 0, random.nextFloat() * -100))
+                .build();
 
             this.addModelToRender(
-                    treeTexture,
+                    treeEntity.getModel().getTexture(),
                     treeEntity
             );
 
-            final var tallGrassEntity = GraphicModel.create(
-                    tallGrassModel,
-                    tallGrassTexture
-            )
-            .setPosition(new Vector3f(random.nextFloat()*128 - 64, 0, random.nextFloat() * -100))
-            .changeScale(.5f);
+            final var tallGrassEntity = GraphicModel.create(tallGrassModel)
+                    .setPosition(new Vector3f(random.nextFloat()*128 - 64, 0, random.nextFloat() * -100))
+                    .setScale(.5f)
+                    .build();
 
             this.addModelToRender(
-                    tallGrassTexture,
+                    tallGrassEntity.getModel().getTexture(),
                     tallGrassEntity
             );
         }
@@ -175,19 +183,43 @@ public class Engine implements IEngine {
                 ColorEnum.WHITE.getValue()
         );
 
-        final var terrainGrassTexture = Texture.loadTexture("src/main/resources/textures/grass.png");
+        final var blendMap = ResourceManager.getTexture(
+                Path.of("src/main/resources/textures/blend-map.png")
+        );
+//        final var terrainGrassTexture = ResourceManager.getTexture(
+//            Path.of("src/main/resources/textures/grass.png")
+//        );
+
+//        final var terrainGrassTexture = Texture.loadTexture("src/main/resources/textures/grass.png");
+        final var texturePack = Terrain.TexturesPack.create(
+                ResourceManager.getTexture(
+                        Path.of("src/main/resources/textures/grass.png")
+                ),
+                ResourceManager.getTexture(
+                        Path.of("src/main/resources/textures/mud.png")
+                ),
+                ResourceManager.getTexture(
+                        Path.of("src/main/resources/textures/grass-flowers.png")
+                ),
+                ResourceManager.getTexture(
+                        Path.of("src/main/resources/textures/path-rocks.png")
+                )
+        );
+
         final var terrain = Terrain.create(
                 0,
                 -1,
                 128,
-                terrainGrassTexture
+                blendMap,
+                texturePack
         );
 
         final var terrain2 = Terrain.create(
                 -1,
                 -1,
                 128,
-                terrainGrassTexture
+                blendMap,
+                texturePack
         );
 
         final var lightTerrain = Light.create(

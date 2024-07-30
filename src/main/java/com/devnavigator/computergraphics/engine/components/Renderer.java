@@ -103,50 +103,31 @@ public class Renderer {
         final Light light,
         final ProgramShader shader
     ) {
-        GL33.glBindVertexArray(model.getModel().getVaoId());
-
-//        model.increasePosition(0f, 0f, -0.01f);
-//        model.increaseRotation(0f, 10f, 0);
-//        model.rotate(
-//            (float)Math.toRadians(
-//                    GLFW.glfwGetTime() * 360.0
-//            )
-//        );
+        GL33.glBindVertexArray(model.getModel().getRawModel().getVao().getId());
 
         shader.updateTransformation(model.getTransformationMatrix());
         shader.updateLight(light);
         shader.updateUseFakeLighting(model.getModel().getTexture().isUseFakeLight());
-        shader.updateShineDamper(model.getShineDamper());
-        shader.updateReflectivity(model.getReflectivity());
+        shader.updateShineDamper(0);//model.getShineDamper());
+        shader.updateReflectivity(0);//model.getReflectivity());
 
+        this.flush(model.getModel().getRawModel().getNumbersOfVertex());
+    }
 
-//        final var lightPosition = shader.getUniformLocation("lightPosition");
-//        final var lightColor = shader.getUniformLocation("lightColor");
+    public void renderTerrain(
+            final Terrain terrain,
+            final Light light,
+            final ProgramShader shader
+    ) {
+        GL33.glBindVertexArray(terrain.getRawModel().getVao().getId());
 
-//        final var shineDamper = shader.getUniformLocation("shineDamper");
-//        final var reflectivity = shader.getUniformLocation("reflectivity");
+        shader.updateTransformation(terrain.getTransformationMatrix());
+        shader.updateLight(light);
+//        shader.updateUseFakeLighting(model.getModel().getTexture().isUseFakeLight());
+        shader.updateShineDamper(0);//model.getShineDamper());
+        shader.updateReflectivity(0);//model.getReflectivity());
 
-//        this.entityShaders.updateUniformValue(
-//                lightPosition,
-//                light.getPosition()
-//        );
-//
-//        this.entityShaders.updateUniformValue(
-//                lightColor,
-//                light.getColor()
-//        );
-//
-//        this.entityShaders.updateUniformValue(
-//                shineDamper,
-//                model.getShineDamper()
-//        );
-//
-//        this.entityShaders.updateUniformValue(
-//                reflectivity,
-//                model.getReflectivity()
-//        );
-
-        this.flush(model.getNumVertex());
+        this.flush(terrain.getRawModel().getNumbersOfVertex());
     }
 
     public void flush(final int numVertex) {
@@ -173,15 +154,35 @@ public class Renderer {
             final List<Light> lights
     ) {
         final var light = lights.get(0);
-        terrains.stream().findAny().ifPresent(terrain -> {
-            this.prepareTexture(terrain.getModel().getTexture());
-        });
+//        terrains.stream().findAny().ifPresent(terrain -> {
+//
+//        });
 
         for(final var terrain: terrains) {
-            this.render(terrain, light, this.terrainShader);
+            this.prepareTextureTerrain(terrain);
+            this.renderTerrain(terrain, light, this.terrainShader);
             this.cleanup();
         }
         this.terrainShader.disableAllVertexPointer();
+    }
+
+    public void prepareTextureTerrain(
+            final Terrain terrain
+    ) {
+        GL33.glActiveTexture(GL33.GL_TEXTURE0);
+        terrain.getTexturesPack().getBackgroudTexture().bind();
+
+        GL33.glActiveTexture(GL33.GL_TEXTURE1);
+        terrain.getTexturesPack().getrTexture().bind();
+
+        GL33.glActiveTexture(GL33.GL_TEXTURE2);
+        terrain.getTexturesPack().getgTexture().bind();
+
+        GL33.glActiveTexture(GL33.GL_TEXTURE3);
+        terrain.getTexturesPack().getbTexture().bind();
+
+        GL33.glActiveTexture(GL33.GL_TEXTURE4);
+        terrain.getBlendMap().bind();
     }
 
     public void prepareRenderEntity() {
@@ -192,6 +193,7 @@ public class Renderer {
 
     public void prepareRenderTerrain() {
         this.terrainShader.use();
+        this.terrainShader.connectTextures();
         this.terrainShader.enableAllVertexPointer();
         this.camera.update(this.terrainShader);
     }

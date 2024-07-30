@@ -23,9 +23,9 @@ public class Texture {
      */
     private int height;
 
-    private final boolean hasTransparency;
+    private boolean hasTransparency;
 
-    private final boolean useFakeLight;
+    private boolean useFakeLight;
 
     /** Creates a texture. */
     public Texture() {
@@ -53,7 +53,23 @@ public class Texture {
     }
 
     public boolean isUseFakeLight() {
-        return useFakeLight;
+        return this.useFakeLight;
+    }
+
+    public void enableTransparency() {
+        this.hasTransparency = true;
+    }
+
+    public void disabledTransparency() {
+        this.hasTransparency = false;
+    }
+
+    public void enableFakeLight() {
+        this.useFakeLight = true;
+    }
+
+    public void disabledFakeLight() {
+        this.useFakeLight = false;
     }
 
     /**

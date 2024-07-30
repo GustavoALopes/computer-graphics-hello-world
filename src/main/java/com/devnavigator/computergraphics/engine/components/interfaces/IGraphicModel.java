@@ -1,5 +1,6 @@
 package com.devnavigator.computergraphics.engine.components.interfaces;
 
+
 import com.devnavigator.computergraphics.components.base.RawModel;
 
 public interface IGraphicModel {
