@@ -1,6 +1,7 @@
 package com.devnavigator.computergraphics.engine;
 
 import com.devnavigator.computergraphics.components.Light;
+import com.devnavigator.computergraphics.components.Player;
 import com.devnavigator.computergraphics.components.Terrain;
 import com.devnavigator.computergraphics.components.base.GraphicModel;
 import com.devnavigator.computergraphics.components.base.ResourceManager;
@@ -33,6 +34,8 @@ public class Engine implements IEngine {
     private List<Terrain> terrains;
 
     private boolean isRunning;
+
+    private Player playerTest;
 
     public Engine() {
         this.keyboardListener = new KeyboardListener();
@@ -86,51 +89,29 @@ public class Engine implements IEngine {
 
         this.renderer.init();
 
-//        this.addModelToRender(
-//                textureTest,
-//                Square.create(
-//                        Point.create(-0.5f, 0.5f),
-//                        Point.create(-0.5f, -0.5f),
-//                        Point.create(0.5f, -0.5f),
-//                        Point.create(0.5f, 0.5f)
-//                ).addTexture(textureTest, new float[] {
-//                         0,0, //VO,
-//                         0,1, //V1
-//                         1,1, //V2
-//                         1,0
-//               })
-//        );
-
-////         .changeColor(1, 255, 255, 255)
-////         .translate(0.5f, 0.5f, 0.f)
-//         .translate(-0.1f, 0.0f, -1f)
-////         .changeScale(0.35f, 0.35f, 1f)
-//         .addTexture(
-//                 "src/main/resources/textures/default.png",
-//                 new float[] {
-//                         0,0, //VO,
-//                         0,1, //V1
-//                         1,1, //V2
-//                         1,0
-//                 }
-//         )
-//        );
-
         this.renderer.getTerrainShader().use();
 
+        final var playerTextureModel = ResourceManager.getOrCreate(
+                Path.of("src/main/resources/models/stanford-bunny.obj"),
+                Path.of("src/main/resources/textures/white-texture.png"),
+                ProgramShader.Types.ENTITY
+        );
 
-//        final var whiteTexture = Texture.loadTexture("src/main/resources/textures/white-texture.png");
-//        final var entity = GraphicModel.loadFromObj(
-//                Path.of("src/main/resources/models/dragon.obj"),
-//                entityTexture,
-//                10,
-//                0
-//        ).setPosition(new Vector3f(20, 0, 20));
-//
-//        this.addModelToRender(
-//                entityTexture,
-//                entity
-//        );
+        final Player player = new Player(
+            playerTextureModel,
+            new Vector3f(0, 0, -20),
+            new Vector3f(0, 0, 0),
+                0.1f,
+            this.keyboardListener
+        );
+
+        this.playerTest = player;
+
+
+        this.addModelToRender(
+                playerTextureModel.getTexture(),
+                player
+        );
 
 
         final var treeModel = ResourceManager.getOrCreate(
@@ -186,11 +167,7 @@ public class Engine implements IEngine {
         final var blendMap = ResourceManager.getTexture(
                 Path.of("src/main/resources/textures/blend-map.png")
         );
-//        final var terrainGrassTexture = ResourceManager.getTexture(
-//            Path.of("src/main/resources/textures/grass.png")
-//        );
 
-//        final var terrainGrassTexture = Texture.loadTexture("src/main/resources/textures/grass.png");
         final var texturePack = Terrain.TexturesPack.create(
                 ResourceManager.getTexture(
                         Path.of("src/main/resources/textures/grass.png")
@@ -320,6 +297,8 @@ public class Engine implements IEngine {
             GL33.glEnable(GL33.GL_DEPTH_TEST);
             GL33.glClear(GL33.GL_COLOR_BUFFER_BIT|GL33.GL_DEPTH_BUFFER_BIT);
 
+            Clock.update();
+
             this.renderer.prepareRenderEntity();
             this.renderer.renderEntity(
                 this.models,
@@ -331,6 +310,8 @@ public class Engine implements IEngine {
                     this.terrains,
                     this.lights
             );
+
+            this.playerTest.move();
 
             this.window.update();
         }

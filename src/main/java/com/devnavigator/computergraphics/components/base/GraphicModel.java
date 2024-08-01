@@ -7,9 +7,9 @@ public class GraphicModel {
 
     private final TexturedModel model;
 
-    private Vector3f position;
+    protected Vector3f position;
 
-    private Vector3f rotation;
+    protected Vector3f rotation;
 
     private float scale;
 
@@ -43,6 +43,16 @@ public class GraphicModel {
         return this;
     }
 
+    protected void increaseRotation(
+            final float x,
+            final float y,
+            final float z
+    ) {
+        this.rotation.x += x;
+        this.rotation.y += y;
+        this.rotation.z += z;
+    }
+
     public Matrix4f getTransformationMatrix() {
         final var matrix = new Matrix4f();
 
@@ -61,6 +71,16 @@ public class GraphicModel {
             final TexturedModel texturedModel
     ) {
         return new Builder(texturedModel);
+    }
+
+    protected void increasePosition(
+            final float x,
+            final float y,
+            final float z
+    ) {
+        this.position.x += x;
+        this.position.y += y;
+        this.position.z += z;
     }
 
     public static class Builder {
