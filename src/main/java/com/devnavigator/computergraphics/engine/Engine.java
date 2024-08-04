@@ -33,6 +33,8 @@ public class Engine implements IEngine {
 
     private List<Terrain> terrains;
 
+    private Camera camera;
+
     private boolean isRunning;
 
     private Player playerTest;
@@ -99,7 +101,7 @@ public class Engine implements IEngine {
 
         final Player player = new Player(
             playerTextureModel,
-            new Vector3f(0, 0, -20),
+            new Vector3f(0, 0, 0),
             new Vector3f(0, 0, 0),
                 0.1f,
             this.keyboardListener
@@ -107,12 +109,10 @@ public class Engine implements IEngine {
 
         this.playerTest = player;
 
-
         this.addModelToRender(
                 playerTextureModel.getTexture(),
                 player
         );
-
 
         final var treeModel = ResourceManager.getOrCreate(
                 Path.of("src/main/resources/models/tree.obj"),
@@ -212,6 +212,11 @@ public class Engine implements IEngine {
         this.terrains.add(terrain);
         this.terrains.add(terrain2);
         this.lights.add(light);
+
+        this.camera = new Camera(
+                this.keyboardListener,
+                player
+        );
 //        this.lights.add(lightTerrain);
 
 
@@ -297,22 +302,19 @@ public class Engine implements IEngine {
             GL33.glEnable(GL33.GL_DEPTH_TEST);
             GL33.glClear(GL33.GL_COLOR_BUFFER_BIT|GL33.GL_DEPTH_BUFFER_BIT);
 
-            Clock.update();
-
-            this.renderer.prepareRenderEntity();
+            this.renderer.prepareRenderEntity(this.camera);
             this.renderer.renderEntity(
                 this.models,
                 this.lights
             );
 
-            this.renderer.prepareRenderTerrain();
+            this.renderer.prepareRenderTerrain(this.camera);
             this.renderer.renderTerrain(
                     this.terrains,
                     this.lights
             );
 
             this.playerTest.move();
-
             this.window.update();
         }
     }

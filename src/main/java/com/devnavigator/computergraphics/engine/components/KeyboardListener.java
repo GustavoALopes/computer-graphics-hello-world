@@ -51,7 +51,7 @@ public class KeyboardListener {
     }
 
     public void bindWindow(final Window window) {
-        window.addCallbackListener(this::move);
+        window.addKeyboardCallbackListener(this::move);
     }
 
     public enum Key {

@@ -1,9 +1,10 @@
 package com.devnavigator.computergraphics.components.base;
 
+import com.devnavigator.computergraphics.engine.components.camera.interfaces.ICameraTarget;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-public class GraphicModel {
+public class GraphicModel implements ICameraTarget {
 
     private final TexturedModel model;
 
@@ -81,6 +82,16 @@ public class GraphicModel {
         this.position.x += x;
         this.position.y += y;
         this.position.z += z;
+    }
+
+    @Override
+    public Vector3f getPosition() {
+        return this.position;
+    }
+
+    @Override
+    public float getYRotation() {
+        return this.rotation.y;
     }
 
     public static class Builder {

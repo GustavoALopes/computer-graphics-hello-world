@@ -1,7 +1,7 @@
 package com.devnavigator.computergraphics.engine.components;
 
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWKeyCallbackI;
+import org.lwjgl.glfw.*;
+import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryUtil;
 
 public class Window {
@@ -25,12 +25,16 @@ public class Window {
         GLFW.glfwMakeContextCurrent(this.id);
         GLFW.glfwSwapInterval(1);
 
+        MouseListener.bindWindow(this);
+
         GLFW.glfwShowWindow(this.id);
     }
 
     public void update() {
+        MouseListener.reset();
         GLFW.glfwSwapBuffers(this.id);
         GLFW.glfwPollEvents();
+        Clock.update();
     }
 
     public boolean shouldClose() {
@@ -41,7 +45,28 @@ public class Window {
         GLFW.glfwDestroyWindow(this.id);
     }
 
-    public void addCallbackListener(final GLFWKeyCallbackI callback) {
+    public void addMouseCallbackListener(
+            final GLFWMouseButtonCallbackI buttonsCallback,
+            final GLFWScrollCallbackI scrollCallback,
+            final GLFWCursorPosCallbackI cursorPosCallback
+    ) {
+        GLFW.glfwSetScrollCallback(
+                this.id,
+                scrollCallback
+        );
+
+        GLFW.glfwSetCursorPosCallback(
+                this.id,
+                cursorPosCallback
+        );
+
+        GLFW.glfwSetMouseButtonCallback(
+                this.id,
+                buttonsCallback
+        );
+    }
+
+    public void addKeyboardCallbackListener(final GLFWKeyCallbackI callback) {
         GLFW.glfwSetKeyCallback(
                 this.id,
                 callback

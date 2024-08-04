@@ -17,7 +17,7 @@ public class Renderer {
 
     private final Projection projection;
 
-    private final Camera camera;
+//    private final Camera camera;
 
     private EntityShader entityShaders;
 
@@ -35,7 +35,9 @@ public class Renderer {
                 displayHeight
         );
 
-        this.camera = new Camera(keyboardListener);
+//        this.camera = new Camera(
+//                keyboardListener
+//        );
     }
 
     public TerrainShader getTerrainShader() {
@@ -185,16 +187,22 @@ public class Renderer {
         terrain.getBlendMap().bind();
     }
 
-    public void prepareRenderEntity() {
+    public void prepareRenderEntity(
+            final Camera camera
+    ) {
         this.entityShaders.use();
         this.entityShaders.enableAllVertexPointer();
-        this.camera.update(this.entityShaders);
+//        this.camera.update(this.entityShaders);
+        camera.update(this.entityShaders);
     }
 
-    public void prepareRenderTerrain() {
+    public void prepareRenderTerrain(
+            final Camera camera
+    ) {
         this.terrainShader.use();
         this.terrainShader.connectTextures();
         this.terrainShader.enableAllVertexPointer();
-        this.camera.update(this.terrainShader);
+//        this.camera.update(this.terrainShader);
+        camera.update(this.terrainShader);
     }
 }
